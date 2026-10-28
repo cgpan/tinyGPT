@@ -14,7 +14,7 @@ pos_emb: true
 # training
 batch_size: 64
 learning_rate: 0.001
-max_iters: 3000
+max_iters: 2500
 eval_interval: 250
 eval_iters: 20
 max_minutes: 9.0

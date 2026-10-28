@@ -20,7 +20,7 @@ class Config:
     # training
     batch_size: int = 64         # windows of text per training step
     learning_rate: float = 0.001
-    max_iters: int = 3000        # training steps
+    max_iters: int = 2500        # training steps
     eval_interval: int = 250     # measure the loss every this many steps
     eval_iters: int = 20         # batches averaged for each measurement
     max_minutes: float = 9.0     # stop early if training runs longer than this

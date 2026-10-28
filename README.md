@@ -7,6 +7,17 @@ of the model, including the attention code, is in this repository and meant to b
 > **Status:** Milestone 1 of 4. The Python package, its tests, and the measured
 > numbers below are done. The chapter notebooks (the handbook itself) come next.
 
+```
+ROMEO:
+Call'd here! me ungly that means a bloody own.
+
+DUKE OF YORK:
+
+DORSET:
+Clifford, all gainst he shall return us our desert.
+```
+<sub>The first sample from the `base` model trained for 3,000 steps (validation loss 1.50), at temperature 1.0.</sub>
+
 ## The number
 
 One number runs through the whole project: the model's **loss** on text it has never
@@ -18,7 +29,7 @@ nats. Lower is better.
 | knowing nothing | **4.17** | 65 | `ln 65`: every one of the 65 characters equally likely |
 | counting bigram | **2.48** | 12.0 | count which character follows which; ~30 lines of NumPy |
 | tinyGPT `small` (0.8M parameters) | **1.69** | 5.4 | 2,000 training steps |
-| tinyGPT `base` (10.7M parameters) | **TBD** | TBD | 3,000 training steps |
+| tinyGPT `base` (10.7M parameters) | **1.49** | 4.4 | 2,500 training steps |
 
 Every number in this table was measured by running the code in this repository
 (see [How these numbers were measured](#how-these-numbers-were-measured)).
@@ -78,11 +89,15 @@ Every run stops by itself after `max_minutes` (9 minutes), so no run goes past
 |---|---|---|---|---|---|---|---|
 | `tiny` | 0.11M | 200 | 6 s | under 1 min | under 1 min | under 1 min | under 1 min |
 | `small` | 0.82M | 2,000 | 2.3 min | about 1 min | under 1 min | 1–2 min | about 1 min |
-| `base` | 10.7M | 3,000 | TBD | 6–9 min | 2–4 min | hits the 9-min limit around step 1,200–1,800 | 4–9 min |
+| `base` | 10.7M | 2,500 | about 1 h 50 min | 6–8 min | 2–4 min | stops at the 9-min limit, around step 900–1,500 | 5–9 min |
 
-The estimates scale this CPU's measured speed by each chip's typical throughput. They
-are rough. `python scripts/benchmark.py` times 10 real steps on your machine and
-prints a projection in about a minute.
+The estimates scale this CPU's measured speed by each chip's typical compute and memory
+speed. They are rough. `python scripts/benchmark.py` times 10 real steps on your machine
+and prints a projection in about a minute.
+
+A `base` run that stops early still gets most of the way: validation loss is already
+1.56 at step 1,500 and 1.51 at step 1,750 (see the curve below). On a base M1/M2/M3
+Mac, expect roughly 1.55–1.75; use Colab instead if you want the full 1.49.
 
 ## What's in the repository
 
@@ -112,9 +127,26 @@ and last 10% of the corpus (1,003,854 and 111,540 characters).
   Without smoothing the validation loss is infinite: 187 character pairs in the
   validation text never occur in the training text.
 - `small`: validation 1.6945 at step 2,000 (training 1.5026).
-- `base`: TBD.
+- `base`: trained for 3,000 steps to see where the curve flattens. The learning rate
+  is constant, so the first 2,500 steps of that run are exactly the 2,500-step run
+  that `configs/base.yaml` now specifies.
 
-Loss values do not depend on the hardware. Training times do.
+  | step | 0 | 250 | 500 | 750 | 1000 | 1250 | 1500 | 1750 | 2000 | 2250 | **2500** | 2750 | 3000 |
+  |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+  | train | 4.34 | 2.40 | 1.93 | 1.64 | 1.48 | 1.39 | 1.34 | 1.30 | 1.26 | 1.24 | **1.21** | 1.19 | 1.18 |
+  | validation | 4.33 | 2.43 | 2.01 | 1.79 | 1.67 | 1.59 | 1.56 | 1.51 | 1.52 | 1.52 | **1.49** | 1.49 | 1.50 |
+
+  After about step 1,750 validation loss improves only slowly (1.51 to 1.49) while
+  training loss keeps falling: the model has started to memorise its training text.
+  Measurements vary by about ±0.015 between nearby steps because each uses 20 random
+  batches.
+
+  The untrained model starts at 4.33, not 4.17: its random starting weights make
+  random, slightly confident guesses, which score worse than an even spread. Smaller
+  models start closer (`tiny` 4.19, `small` 4.20).
+
+Loss values come out essentially the same on any hardware (small floating-point
+differences aside). Training times do not.
 
 ## Credits
 
