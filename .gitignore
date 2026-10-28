@@ -1,0 +1,15 @@
+# python
+__pycache__/
+*.egg-info/
+.venv/
+build/
+
+# training output: checkpoints are large and regenerable
+runs/
+*.pt
+
+# notebooks
+.ipynb_checkpoints/
+
+# os noise
+.DS_Store

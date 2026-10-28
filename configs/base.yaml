@@ -1,0 +1,21 @@
+# The full tinyGPT: about 10.7 million parameters.
+# Meant for a GPU (Colab T4, a gaming GPU, or Apple Silicon).
+
+# the model
+vocab_size: 65
+block_size: 128
+n_layer: 6
+n_head: 6
+n_embd: 384
+dropout: 0.2
+causal: true
+pos_emb: true
+
+# training
+batch_size: 64
+learning_rate: 0.001
+max_iters: 3000
+eval_interval: 250
+eval_iters: 20
+max_minutes: 9.0
+seed: 1337
