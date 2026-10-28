@@ -44,6 +44,14 @@ def test_exactly_one_open_box(path):
 
 
 @pytest.mark.parametrize("path", NOTEBOOKS, ids=lambda p: p.stem)
+def test_solutions_live_in_their_own_file(path):
+    text = "\n".join(cells(path, "markdown"))
+    assert f"solutions/{path.stem}.md" in text
+    assert (path.parents[1] / "solutions" / f"{path.stem}.md").exists()
+    assert not any("Solution" in source for source in cells(path, "code"))
+
+
+@pytest.mark.parametrize("path", NOTEBOOKS, ids=lambda p: p.stem)
 def test_no_model_code_is_defined_in_the_notebook(path):
     for source in cells(path, "code"):
         assert not re.search(r"^\s*class ", source, re.MULTILINE)

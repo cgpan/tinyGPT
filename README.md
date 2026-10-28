@@ -137,6 +137,7 @@ src/tinygpt/          the package: everything you import
     check.py          checks for the Make challenges
     shakespeare.txt   the corpus (1,115,394 characters)
 notebooks/            the chapters
+solutions/            worked solutions to each chapter's Make challenge
 configs/              tiny.yaml, small.yaml, base.yaml
 scripts/              train.py, sample.py, benchmark.py
 tests/                pytest suite; runs in seconds on a CPU

@@ -36,7 +36,9 @@ extra cell into the repository.
 - **The number.** Each chapter ends with `tinygpt.scoreboard(...)`, which places the
   student's result between 4.17 (knowing nothing) and 1.49 (tinyGPT).
 - **Make challenges** are checked by `tinygpt.check`, which prints ✓ or one specific
-  hint and never stops the notebook. Solutions are in a collapsed cell at the end.
+  hint and never stops the notebook. Solutions, with a short explanation, are in
+  `solutions/`, one file per chapter, linked from the end of each Make section. A test
+  runs every solution against its check.
 
 ## Editing a notebook
 
