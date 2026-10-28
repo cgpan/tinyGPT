@@ -40,5 +40,5 @@ def print_setup():
         hardware = "CPU only"
     print(f"tinyGPT {metadata.version('tinygpt')} is ready. PyTorch {torch.__version__}, running on: {hardware}.")
     if device == "cpu":
-        print("No GPU found. That's fine for chapters 1 and 2; from chapter 3 on you need one.\n"
-              "In Colab: Runtime > Change runtime type > T4 GPU, then run this cell again.")
+        print("No GPU found. Chapters 1 to 4 work without one (3 and 4 just run more slowly);\n"
+              "chapter 5 needs one. In Colab: Runtime > Change runtime type > T4 GPU, then run this cell again.")

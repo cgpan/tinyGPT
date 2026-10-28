@@ -64,3 +64,11 @@ def test_too_long_input_is_rejected():
 def test_n_embd_must_divide_into_heads():
     with pytest.raises(ValueError, match="divisible"):
         tiny(n_embd=30, n_head=4)
+
+
+def test_attention_weights_look_only_backwards_and_sum_to_one():
+    torch.manual_seed(0)
+    head = GPT(tiny()).blocks[0].attn.heads[0]
+    weights = head.attention_weights(torch.randn(3, 8, 32))
+    assert torch.allclose(weights.sum(-1), torch.ones(3, 8))
+    assert torch.all(torch.triu(weights, diagonal=1) == 0)

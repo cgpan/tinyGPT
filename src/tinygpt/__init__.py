@@ -7,15 +7,15 @@ from tinygpt.config import Config, get_device, load_config
 from tinygpt.data import get_batch, load_data, load_text
 from tinygpt.model import GPT, BigramLM, count_params
 from tinygpt.notebook import print_setup, show
-from tinygpt.plots import bigram_heatmap, char_counts, scoreboard
+from tinygpt.plots import attention_map, bigram_heatmap, char_counts, plot_history, scoreboard
 from tinygpt.sampling import generate, sample
 from tinygpt.tokenizer import CharTokenizer
 from tinygpt.training import estimate_loss, train, train_step
 
 __all__ = [
     "BigramLM", "CharTokenizer", "Config", "CountBigram", "GPT",
-    "bigram_heatmap", "char_counts", "check", "count_params", "estimate_loss",
-    "generate", "get_batch", "get_device", "load_checkpoint", "load_config",
-    "load_data", "load_text", "print_setup", "sample", "save_checkpoint",
-    "scoreboard", "show", "train", "train_step",
+    "attention_map", "bigram_heatmap", "char_counts", "check", "count_params",
+    "estimate_loss", "generate", "get_batch", "get_device", "load_checkpoint",
+    "load_config", "load_data", "load_text", "plot_history", "print_setup",
+    "sample", "save_checkpoint", "scoreboard", "show", "train", "train_step",
 ]

@@ -49,3 +49,14 @@ def test_checkpoint_round_trip(tmp_path):
     assert torch.equal(model(x)[0], loaded(x)[0])
     assert tok.vocab_size == 65
     assert loaded_history == history
+
+
+def test_train_uses_the_step_function_it_is_given():
+    calls = []
+
+    def my_step(model, x, y, optimizer):
+        calls.append(x.shape)
+        return train_step(model, x, y, optimizer)
+
+    train(tiny(), device="cpu", step_fn=my_step)
+    assert calls == [(4, 8)] * 20

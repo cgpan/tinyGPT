@@ -97,3 +97,76 @@ def test_char_counts_and_heatmap_draw():
     tok = tinygpt.CharTokenizer.from_text("abc")
     tinygpt.bigram_heatmap(tinygpt.CountBigram(3).fit([0, 1, 2, 0]).counts, tok)
     assert plt.get_fignums()
+
+
+def test_plot_history_prints_its_numbers(capsys):
+    history = [{"step": 0, "train_loss": 4.2, "val_loss": 4.2}, {"step": 10, "train_loss": 2.0, "val_loss": 2.5}]
+    tinygpt.plot_history(history)
+    assert "validation" in capsys.readouterr().out
+    tinygpt.plot_history({"lr 0.01": history, "lr 0.1": history})
+    out = capsys.readouterr().out
+    assert "lr 0.01" in out and "2.500" in out
+
+
+def test_attention_map_reports_where_the_head_looks(capsys):
+    cfg = tinygpt.Config(vocab_size=65, block_size=16, n_layer=1, n_head=2, n_embd=16, dropout=0.0)
+    tok = tinygpt.CharTokenizer.from_text(tinygpt.load_text())
+    model = tinygpt.GPT(cfg).train()
+    tinygpt.attention_map(model, tok, "To be, or not", head=1)
+    assert "Reading the last character, 't'" in capsys.readouterr().out
+    assert model.training
+
+
+# --- the chapter 3 and 4 checks ---------------------------------------------------
+
+def test_train_step_check_accepts_the_real_one(capsys):
+    check.train_step(tinygpt.train_step)
+    assert capsys.readouterr().out.startswith("✓")
+
+
+def test_train_step_check_spots_missing_zero_grad(capsys):
+    def forgetful(model, x, y, optimizer):
+        loss = model(x, y)[1]
+        loss.backward()
+        optimizer.step()
+        return loss.item()
+    check.train_step(forgetful)
+    assert "optimizer.zero_grad()" in capsys.readouterr().out
+
+
+def test_train_step_check_spots_a_missing_step(capsys):
+    def lazy(model, x, y, optimizer):
+        return model(x, y)[1].item()
+    check.train_step(lazy)
+    assert "optimizer.step()" in capsys.readouterr().out
+
+
+def test_attention_check(capsys):
+    import math
+    import torch
+    from torch.nn import functional as F
+
+    def attention(q, k, v, mask=True):
+        scores = q @ k.transpose(-2, -1) / math.sqrt(k.shape[-1])
+        if mask:
+            T = q.shape[1]
+            scores = scores.masked_fill(torch.tril(torch.ones(T, T)) == 0, float("-inf"))
+        return F.softmax(scores, dim=-1) @ v
+
+    check.attention(attention)
+    assert capsys.readouterr().out.startswith("✓")
+    check.attention(lambda q, k, v: attention(q, k, v, mask=False))
+    assert "can see the future" in capsys.readouterr().out
+    check.attention(lambda q, k, v: v)
+    assert "doesn't match" in capsys.readouterr().out
+
+
+def test_param_count_check(capsys):
+    def formula(vocab_size, block_size, n_layer, n_embd):
+        d = n_embd
+        per_block = 12 * d * d + 10 * d
+        return vocab_size * d + block_size * d + n_layer * per_block + 2 * d + d * vocab_size + vocab_size
+    check.param_count(formula)
+    assert capsys.readouterr().out.startswith("✓")
+    check.param_count(lambda vocab_size, block_size, n_layer, n_embd: 12 * n_layer * n_embd ** 2)
+    assert "off by" in capsys.readouterr().out

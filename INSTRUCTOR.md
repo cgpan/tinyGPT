@@ -74,3 +74,46 @@ The numbers students should see (all measured), and where they tend to get stuck
 - Hand-written loops over a tensor are slow; the cells pass `train_ids.tolist()`.
   A student who builds a 5-character table runs out of memory (it needs 9 GB): restart
   the runtime and run the setup cell again.
+
+### Chapter 3 · Learning instead of counting (no GPU needed)
+
+- The learned bigram (learning rate 0.01, 2,000 steps) starts at exactly 4.17, because
+  its scores start at zero, and ends at about 2.49: 2.489 on the whole validation text,
+  against counting's 2.482.
+- Learning rates: 0.001 is still at 2.75 after 2,000 steps; 0.01 and 0.1 reach about
+  2.49; 1.0 stalls near 2.58; 10 bounces around 3.1.
+- Forgetting `zero_grad`: the loss gets *worse* as training goes on, from 2.61 to 2.85.
+- The untrained transformer (`base`, seed 1337) starts at 4.33. Its favourite next
+  character gets 4.2% on average where an even spread gives 1.5%.
+- This is the first chapter with PyTorch. Students don't need to understand how
+  gradients are computed; the five lines of `train_step` are the whole story here.
+- Expect "learning gave the same number, so what was the point?" The answer is in
+  Common questions, and it pays off in chapter 4.
+- A GPU makes no difference in this chapter: the model is too small to benefit.
+
+### Chapter 4 · Looking back: attention (GPU recommended)
+
+- One block with 64 characters of memory (`small` with `n_layer=1`, 223,041
+  parameters): 1.76, in about 35 seconds on a 4-core CPU.
+- Without the mask: 0.04, and its writing is almost all line breaks.
+- Memory length: 8 characters give 2.10, 16 give 1.92, 64 give 1.76.
+- The attention pictures differ from run to run: which head does what depends on
+  training. In our run one head looked almost only at the previous character. The
+  questions are worded so that any pattern works.
+- The mask experiment is the chapter's key moment: a near-perfect loss from a model that
+  cannot write. Give students time with "why did the low loss mislead us?". It is the same
+  lesson as a leaky evaluation in their own research.
+
+### Chapter 5 · The full run (GPU needed)
+
+- `base`: 10,739,777 parameters. Validation 1.49 at step 2,500 (training 1.21); it
+  passes 2.48 at about step 250.
+- The 6 to 8 minutes on a T4 is an estimate. Time one run before you share the chapter.
+- Feed-forward holds two-thirds of the parameters (7.09M of 10.74M); attention one-third.
+- `small` ablations (2,000 steps): one block 1.76, two blocks 1.70, four blocks 1.69.
+  Without positional embeddings: 1.81. Dropout 0.2: 1.83 (training 1.68), worse than
+  none: it narrows the gap between training and validation loss a little, but a small
+  model trained this briefly loses more from it than it gains. `base` uses dropout 0.2
+  because a 10.7M-parameter model memorises far more.
+- Make, part 1: each block has 12d² + 10d parameters. Part 2 has no fixed answer.
+- In Colab the trained model in `runs/base/model.pt` disappears when the session ends.

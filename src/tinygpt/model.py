@@ -56,16 +56,19 @@ class Head(nn.Module):
         self.dropout = nn.Dropout(cfg.dropout)
         self.causal = cfg.causal
 
-    def forward(self, x):
+    def attention_weights(self, x):
+        """Where each position looks: a (B, T, T) table whose rows each sum to 1."""
         B, T, C = x.shape
-        q, k, v = self.query(x), self.key(x), self.value(x)          # each (B, T, head_size)
+        q, k = self.query(x), self.key(x)                            # each (B, T, head_size)
         scores = q @ k.transpose(-2, -1) / math.sqrt(k.shape[-1])    # (B, T, T): how well query t matches key s
         if self.causal:
             past = torch.tril(torch.ones(T, T, dtype=torch.bool, device=x.device))
             scores = scores.masked_fill(~past, float("-inf"))        # position t may not look at any s > t
-        weights = F.softmax(scores, dim=-1)                          # each row now sums to 1
-        weights = self.dropout(weights)
-        return weights @ v                                           # (B, T, head_size)
+        return F.softmax(scores, dim=-1)                             # each row now sums to 1
+
+    def forward(self, x):
+        weights = self.dropout(self.attention_weights(x))
+        return weights @ self.value(x)                               # (B, T, head_size): weighted average of values
 
 
 class MultiHeadAttention(nn.Module):

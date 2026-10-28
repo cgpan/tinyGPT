@@ -12,6 +12,7 @@ MUTED = "#898781"
 AXIS = "#c3c2b7"
 BLUE = "#2a78d6"
 BLUE_RAMP = ["#fcfcfb", "#cde2fb", "#9ec5f4", "#6da7ec", "#3987e5", "#256abf", "#184f95", "#0d366b"]
+SERIES = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#6250d6", "#e34948"]
 
 # the three numbers every chapter is measured against
 LANDMARKS = {"knowing nothing": 4.17, "counting pairs": 2.48, "tinyGPT": 1.49}
@@ -105,5 +106,90 @@ def bigram_heatmap(counts, tok):
     bar.ax.set_yticklabels([f"{m:,}" for m in marks], color=INK_2, fontsize=8)
     bar.outline.set_visible(False)
     bar.set_label("times this pair appears", color=INK_2)
+    fig.tight_layout()
+    plt.show()
+
+
+def plot_history(runs):
+    """Line chart of the loss as training goes on.
+
+    runs: the history from one train() call, which draws its training and validation
+    loss; or a dict like {"lr 0.01": history, "lr 0.1": history} to compare the
+    validation loss of several runs.
+    """
+    if isinstance(runs, dict):
+        lines = {name: [(r["step"], r["val_loss"]) for r in history] for name, history in runs.items()}
+        title = "Validation loss while training"
+    else:
+        lines = {"training": [(r["step"], r["train_loss"]) for r in runs],
+                 "validation": [(r["step"], r["val_loss"]) for r in runs]}
+        title = "Loss while training"
+    print(f"{'':<26}{'start':>8}{'end':>8}{'lowest':>8}")
+    for name, points in lines.items():
+        values = [v for _, v in points]
+        print(f"{name:<26}{values[0]:>8.3f}{values[-1]:>8.3f}{min(values):>8.3f}")
+
+    plt, fig, ax = _axes((9, 4.2))
+    values = [v for points in lines.values() for _, v in points]
+    ax.set_ylim(min(1.3, min(values) - 0.1), max(4.4, max(values) + 0.1))
+    ax.yaxis.grid(True, color="#e1e0d9", lw=0.8)
+    ax.set_axisbelow(True)
+    for name, value in LANDMARKS.items():
+        ax.axhline(value, color=AXIS, lw=1, zorder=1)
+        ax.text(1.01, value, f"{name} {value:.2f}", transform=ax.get_yaxis_transform(),
+                va="center", fontsize=8, color=MUTED)
+    for (name, points), color in zip(lines.items(), SERIES):
+        ax.plot(*zip(*points), color=color, lw=2, label=name, solid_capstyle="round", zorder=2)
+    ax.set_xlabel("training step", color=INK_2)
+    ax.set_ylabel("loss", color=INK_2)
+    ax.set_title(title, loc="left", fontsize=10, color=INK_2)
+    if len(lines) > 1:
+        ax.legend(frameon=False, labelcolor=INK_2, fontsize=9)
+    fig.tight_layout(rect=(0, 0, 0.86, 1))
+    plt.show()
+
+
+def attention_map(model, tok, text, layer=0, head=0):
+    """Heatmap of where one attention head looks while it reads `text`.
+
+    Row t shows how the character at position t spreads its attention over the
+    characters up to and including itself. Each row sums to 1.
+    """
+    import torch
+    from matplotlib.colors import LinearSegmentedColormap
+
+    attention_head = model.blocks[layer].attn.heads[head]
+    seen = {}
+    hook = attention_head.register_forward_pre_hook(lambda module, args: seen.update(x=args[0]))
+    was_training = model.training
+    model.eval()
+    try:
+        with torch.no_grad():
+            idx = torch.tensor([tok.encode(text)], device=next(model.parameters()).device)
+            model(idx)
+            weights = attention_head.attention_weights(seen["x"])[0].cpu().numpy()
+    finally:
+        hook.remove()
+        model.train(was_training)
+
+    top = np.argsort(weights[-1])[::-1][:3]
+    looks = ", ".join(f"{text[i]!r} at position {i} ({weights[-1][i]:.2f})" for i in top)
+    print(f"Reading the last character, {text[-1]!r}, this head looks most at: {looks}")
+
+    plt, fig, ax = _axes((7.5, 7))
+    ax.spines["bottom"].set_visible(False)
+    labels = [char_label(ch) for ch in text]
+    image = ax.imshow(weights, cmap=LinearSegmentedColormap.from_list("blues", BLUE_RAMP), vmin=0, vmax=1)
+    ax.set_xticks(range(len(labels)), labels, fontsize=7)
+    ax.set_yticks(range(len(labels)), labels, fontsize=7)
+    ax.tick_params(length=0, labeltop=True, labelbottom=False)
+    ax.set_xlabel("looks at this character", color=INK_2)
+    ax.xaxis.set_label_position("top")
+    ax.set_ylabel("while reading this character", color=INK_2)
+    bar = fig.colorbar(image, ax=ax, shrink=0.6)
+    bar.outline.set_visible(False)
+    bar.ax.tick_params(labelcolor=INK_2, labelsize=8)
+    bar.set_label("attention weight", color=INK_2)
+    ax.set_title(f"Layer {layer}, head {head}", loc="left", fontsize=10, color=INK_2)
     fig.tight_layout()
     plt.show()

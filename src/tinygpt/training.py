@@ -32,12 +32,13 @@ def estimate_loss(model, ids, cfg, device):
     return sum(losses) / len(losses)
 
 
-def train(cfg, model=None, data=None, device=None, save_path=None):
+def train(cfg, model=None, data=None, device=None, save_path=None, step_fn=train_step):
     """Train `model` (a new GPT unless you pass one) and return (model, history).
 
     `history` has one row per measurement: {"step", "train_loss", "val_loss", "minutes"}.
     Training stops after cfg.max_iters steps, or sooner if it has been running
     for cfg.max_minutes. If `save_path` is given, the trained model is saved there.
+    `step_fn` does each step of learning; pass your own to try it in the real loop.
     """
     device = device or get_device()
     if device == "cpu":
@@ -56,7 +57,8 @@ def train(cfg, model=None, data=None, device=None, save_path=None):
     model.to(device)
     model.train()
     optimizer = torch.optim.AdamW(model.parameters(), lr=cfg.learning_rate)
-    print(f"{count_params(model) / 1e6:.2f}M parameters, training on {device}")
+    n = count_params(model)
+    print(f"{n / 1e6:.2f}M" if n >= 1e6 else f"{n:,}", f"parameters, training on {device}")
 
     history = []
     start = time.time()
@@ -74,7 +76,7 @@ def train(cfg, model=None, data=None, device=None, save_path=None):
         if last:
             break
         x, y = get_batch(train_ids, cfg.block_size, cfg.batch_size, device)
-        train_step(model, x, y, optimizer)
+        step_fn(model, x, y, optimizer)
 
     if step < cfg.max_iters:
         print(f"stopped early at step {step}: training reached max_minutes = {cfg.max_minutes}")
