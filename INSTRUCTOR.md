@@ -95,13 +95,14 @@ The numbers students should see (all measured), and where they tend to get stuck
 
 - One block with 64 characters of memory (`small` with `n_layer=1`, 223,041
   parameters): 1.76, in about 35 seconds on a 4-core CPU.
-- Without the mask: 0.04, and its writing is almost all line breaks.
+- Without the mask: 0.04, and its writing is gibberish (in our run, `ROMEO::EO::O::O::::`
+  and colons from then on).
 - Memory length: 8 characters give 2.10, 16 give 1.92, 64 give 1.76.
 - The attention pictures differ from run to run: which head does what depends on
   training. In our run one head looked almost only at the previous character. The
   questions are worded so that any pattern works.
 - The mask experiment is the chapter's key moment: a near-perfect loss from a model that
-  cannot write. Give students time with "why did the low loss mislead us?". It is the same
+  can't write. Give students time with "why did the low loss mislead us?". It is the same
   lesson as a leaky evaluation in their own research.
 
 ### Chapter 5 · The full run (GPU needed)

@@ -41,8 +41,6 @@ def train(cfg, model=None, data=None, device=None, save_path=None, step_fn=train
     `step_fn` does each step of learning; pass your own to try it in the real loop.
     """
     device = device or get_device()
-    if device == "cpu":
-        print("warning: no GPU found, so this will be very slow. See the README.")
     if device == "cuda":
         torch.set_float32_matmul_precision("high")               # faster matrix maths on recent NVIDIA GPUs
     torch.manual_seed(cfg.seed)
@@ -59,6 +57,8 @@ def train(cfg, model=None, data=None, device=None, save_path=None, step_fn=train
     optimizer = torch.optim.AdamW(model.parameters(), lr=cfg.learning_rate)
     n = count_params(model)
     print(f"{n / 1e6:.2f}M" if n >= 1e6 else f"{n:,}", f"parameters, training on {device}")
+    if device == "cpu" and n > 1_000_000:
+        print("warning: no GPU found, and a model this size trains slowly on a CPU. See the README.")
 
     history = []
     start = time.time()
