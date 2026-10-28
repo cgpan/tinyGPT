@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "A character-level transformer you build and train yourself, on tinyshakespeare."
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = ["torch", "numpy", "pyyaml"]
+dependencies = ["torch", "numpy", "pyyaml", "matplotlib"]
 
 [project.optional-dependencies]
 dev = ["pytest"]

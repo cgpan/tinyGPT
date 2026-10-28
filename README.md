@@ -4,8 +4,8 @@ Build and train a small GPT yourself: a character-level transformer that learns 
 write Shakespeare-like text from one 1 MB file. No `transformers` library. Every line
 of the model, including the attention code, is in this repository and meant to be read.
 
-> **Status:** Milestone 1 of 4. The Python package, its tests, and the measured
-> numbers below are done. The chapter notebooks (the handbook itself) come next.
+> **Status:** Milestone 2 of 4. The package, its tests, the measured numbers below, and
+> chapters 1 and 2 are done. Chapters 3 to 7 come next.
 
 ```
 ROMEO:
@@ -34,6 +34,27 @@ nats. Lower is better.
 Every number in this table was measured by running the code in this repository
 (see [How these numbers were measured](#how-these-numbers-were-measured)).
 
+## Chapters
+
+Work through them in order. Each chapter opens one part of the model, and asks how that
+part moves the number.
+
+| | chapter | open box | the number | GPU |
+|---|---|---|---|---|
+| 1 | [Text is numbers](notebooks/01_text_is_numbers.ipynb) [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/cgpan/tinyGPT/blob/main/notebooks/01_text_is_numbers.ipynb) | the tokenizer | 4.17 → 3.35 | no |
+| 2 | [Counting beats guessing](notebooks/02_counting.ipynb) [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/cgpan/tinyGPT/blob/main/notebooks/02_counting.ipynb) | the counting bigram | 3.35 → 2.48 | no |
+| 3–7 | *coming next* | | → 1.49 | yes |
+
+Every chapter follows the same five steps: **Predict** what will happen, **Run** it,
+**Investigate** the code that ran, **Modify** one thing and explain the result, and,
+as an optional challenge, **Make** that chapter's piece yourself.
+
+**In Colab:** click a badge and run the first cell. It downloads and installs everything.
+**On your own computer:** clone the repository (see [Quick start](#quick-start)), open
+a notebook from the `notebooks/` folder in Jupyter or VS Code, and run the first cell.
+
+Teaching with it? See [INSTRUCTOR.md](INSTRUCTOR.md).
+
 ## What you need
 
 A GPU. Any one of these works:
@@ -60,7 +81,7 @@ From a terminal, in the environment you want to use:
 git clone https://github.com/cgpan/tinyGPT.git
 cd tinyGPT
 python -m pip install -e ".[dev]"
-python -m pytest                             # 41 tests, a few seconds
+python -m pytest                             # the tests: a few seconds
 python scripts/train.py configs/tiny.yaml    # whole pipeline in seconds
 python scripts/benchmark.py                  # how long each config will take on this machine
 python scripts/train.py configs/base.yaml    # the full model
@@ -111,10 +132,15 @@ src/tinygpt/          the package: everything you import
     sampling.py       generate text one character at a time
     config.py         all the settings in one place
     checkpoint.py     save a trained model; load it on any machine
+    notebook.py       show() displays a chapter's open box; print_setup()
+    plots.py          the scoreboard and other charts
+    check.py          checks for the Make challenges
     shakespeare.txt   the corpus (1,115,394 characters)
+notebooks/            the chapters
 configs/              tiny.yaml, small.yaml, base.yaml
 scripts/              train.py, sample.py, benchmark.py
 tests/                pytest suite; runs in seconds on a CPU
+INSTRUCTOR.md         notes for teaching with it
 ```
 
 ## How these numbers were measured
