@@ -283,3 +283,29 @@ def catches(test, bug):
         problem = _test_problem(test)
     _report(None if problem else f"{test.__name__} still passes with the {bug} bug planted, so it doesn't catch it.",
             f"{test.__name__} passes on correct code and catches the {bug} bug ({problem}).")
+
+
+def per_character(fn):
+    """fn(tokens, surprises) -> the average surprise per character. tokens are strings; surprises are numbers."""
+    _report(_per_character_problem(fn),
+            "Your function averages per character. Now you can compare any two language models fairly.")
+
+
+def _per_character_problem(fn):
+    cases = [(["To", " be", ",", " or"], [1.0, 2.0, 0.5, 1.5]),
+             (["\n", "ROMEO", ":"], [0.2, 4.0, 0.1]),
+             (["a", "b", "c"], [3.0, 1.0, 2.0])]
+    for tokens, surprises in cases:
+        want = sum(surprises) / sum(len(t) for t in tokens)
+        got, error = _call(fn, tokens, surprises)
+        if error:
+            return error
+        if not isinstance(got, (int, float)):
+            return f"your function returned {_short(got)}; return a number."
+        if math.isclose(got, want, rel_tol=1e-6):
+            continue
+        if math.isclose(got, sum(surprises) / len(tokens), rel_tol=1e-6):
+            return (f"for tokens {tokens!r} you gave {got:.3f}, the average per *token*. Divide the total "
+                    f"surprise by the number of characters the tokens cover instead.")
+        return f"for tokens {tokens!r} and surprises {surprises}, the answer is {want:.3f}, but yours is {got:.3f}."
+    return None

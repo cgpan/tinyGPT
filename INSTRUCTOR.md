@@ -150,12 +150,28 @@ The numbers students should see (all measured), and where they tend to get stuck
     of 1.76. The Make challenge is to write the test that catches it.
 - With `no_shift` the one-block model's loss falls to 0.000 within 250 steps, and it
   writes nothing but colons.
-- A run of the suite takes 5 to 10 seconds. The clean run has 114 tests. Runs with a bug
-  planted leave out the tests of the bug-planting and of the solutions, which need
-  tinyGPT without a bug, so they have 102.
+- A run of the suite takes 5 to 10 seconds. Runs with a bug planted leave out the tests
+  of the bug-planting and of the solutions, which need tinyGPT without a bug, so they
+  report a dozen or so fewer tests than the clean run.
 - Modify B suits a "coding with AI" lesson: students ask an AI assistant for a test, then
   check whether it really fails when the bug is planted. The example test in the cell
   only checks shapes, and doesn't catch the bug.
 - Bugs are planted with `tinygpt.bugs.planted(...)` inside a `with` block, and removed
   when the block ends. `tinygpt.run_tests(bug=...)` plants one for a whole run of the
   suite, in a separate process.
+
+### Chapter 8 · Meet a real one (optional; GPU recommended)
+
+- Downloads GPT-2 small (`openai-community/gpt2`, about 500 MB) from Hugging Face with
+  the `transformers` library. Colab has the library already; `load_gpt2()` installs it
+  anywhere else.
+- Measured for tinyGPT (`base`, 3,000 steps): 1.486 nats per character on the whole
+  validation text, read in 128-character windows, and 1.88 on the modern-English example
+  in Modify A.
+- **GPT-2's numbers are not measured yet.** The environment this was built in could not
+  reach huggingface.co, so the chapter states no GPT-2 results; students measure them.
+  Before sharing, run the chapter once and write GPT-2's per-token and per-character
+  numbers here.
+- The comparison code was tested with a small, untrained GPT-2 built locally from the
+  same `transformers` classes, and `load_gpt2` was tested loading from a local folder.
+- Text pasted into Modify A often has curly quotes (’ “ ”), which tinyGPT can't read.

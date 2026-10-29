@@ -1,6 +1,6 @@
 """tinyGPT: a character-level transformer you build and train yourself."""
 
-from tinygpt import bugs, check
+from tinygpt import bugs, check, compare
 from tinygpt.bigram import CountBigram
 from tinygpt.checkpoint import load_checkpoint, save_checkpoint
 from tinygpt.config import Config, get_device, load_config
@@ -14,7 +14,7 @@ from tinygpt.training import estimate_loss, train, train_step
 
 __all__ = [
     "BigramLM", "CharTokenizer", "Config", "CountBigram", "GPT",
-    "attention_map", "bigram_heatmap", "bugs", "char_counts", "check", "count_params",
+    "attention_map", "bigram_heatmap", "bugs", "char_counts", "check", "compare", "count_params",
     "estimate_loss", "generate", "get_batch", "get_device", "keep_model",
     "load_checkpoint", "load_config", "load_data", "load_kept_model", "load_text",
     "longest_copy", "plot_history", "print_setup", "run_tests", "sample", "save_checkpoint",

@@ -5,7 +5,8 @@ write Shakespeare-like text from one 1 MB file. No `transformers` library. Every
 of the model, including the attention code, is in this repository and meant to be read.
 
 > **Status:** in progress. The package, its tests, the measured numbers below, and
-> chapters 1 to 7 are done. The optional chapter 8 comes next.
+> all eight chapters are written. Still to do: measuring GPT-2's numbers for chapter 8,
+> and testing on a Mac and a Windows PC.
 
 ```
 ROMEO:
@@ -48,7 +49,7 @@ part moves the number.
 | 5 | [The full run](notebooks/05_full_run.ipynb) [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/cgpan/tinyGPT/blob/main/notebooks/05_full_run.ipynb) | one transformer block | 1.76 → 1.49 | yes |
 | 6 | [Talking to your model](notebooks/06_talking.ipynb) [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/cgpan/tinyGPT/blob/main/notebooks/06_talking.ipynb) | the writing loop | 1.49, and what temperature does to it | only to retrain |
 | 7 | [How do you know it works?](notebooks/07_testing.ipynb) [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/cgpan/tinyGPT/blob/main/notebooks/07_testing.ipynb) | the model's tests | 4.17, as a test | no |
-| 8 | *coming next (optional)* | | | |
+| 8 | [Meet a real one](notebooks/08_meet_gpt2.ipynb) (optional) [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/cgpan/tinyGPT/blob/main/notebooks/08_meet_gpt2.ipynb) | how a model reads a text | tinyGPT against GPT-2, per character | recommended |
 
 Every chapter follows the same five steps: **Predict** what will happen, **Run** it,
 **Investigate** the code that ran, **Modify** one thing and explain the result, and,

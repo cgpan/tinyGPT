@@ -45,7 +45,7 @@ def scoreboard(results=None):
     rows = [(v, k, "landmark") for k, v in LANDMARKS.items()] + [(v, k, "yours") for k, v in results.items()]
     print("validation loss (lower is better)")
     for value, name, kind in sorted(rows, reverse=True):
-        print(f"  {value:5.2f}  {name:<32} {kind}")
+        print(f"  {value:5.2f}  {name:<36} {kind}")
 
     plt, fig, ax = _axes((9, 2.8))
     low = min([1.0, *(v - 0.3 for v in results.values())])
