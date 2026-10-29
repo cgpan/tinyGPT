@@ -15,7 +15,7 @@ def test_the_three_configs_exist():
 
 @pytest.mark.parametrize("path", CONFIGS, ids=lambda p: p.stem)
 def test_config_spells_out_every_setting_with_the_right_type(path):
-    values = yaml.safe_load(path.read_text())
+    values = yaml.safe_load(path.read_text(encoding="utf-8"))
     expected = {f.name: type(f.default) for f in fields(Config)}
     assert set(values) == set(expected)
     for key, value in values.items():

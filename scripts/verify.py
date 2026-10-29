@@ -29,7 +29,9 @@ RUNS = ROOT / "runs"
 
 def run(*command):
     """Run a command in the repository; return its output (stdout and stderr together)."""
-    done = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, encoding="utf-8", errors="replace")
+    env = dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUTF8="1")
+    done = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, encoding="utf-8", errors="replace",
+                          env=env)
     return (done.stdout + done.stderr).strip()
 
 
@@ -57,10 +59,10 @@ def training(names):
         say(f"training configs/{name}.yaml ...")
         cfg = tinygpt.load_config(ROOT / "configs" / f"{name}.yaml")
         out = io.StringIO()
-        start = time.time()
+        start = time.perf_counter()
         with contextlib.redirect_stdout(out):
             model, history = tinygpt.train(cfg, save_path=RUNS / name / "model.pt")
-        minutes = (time.time() - start) / 60
+        minutes = (time.perf_counter() - start) / 60
         last = history[-1]
         lines.append(f"| {name} | {tinygpt.count_params(model):,} | {last['step']:,} | {minutes:.1f} | "
                      f"{last['train_loss']:.4f} | {last['val_loss']:.4f} | {last['step'] < cfg.max_iters} |")
@@ -88,14 +90,14 @@ def notebooks(names):
             continue
         say(f"running {path.name} ...")
         nb = nbformat.read(path, as_version=4)
-        start = time.time()
+        start = time.perf_counter()
         client = NotebookClient(nb, timeout=1800, kernel_name="tinygpt-verify", allow_errors=True,
                                 resources={"metadata": {"path": str(path.parent)}})
         try:
             client.execute()
         except Exception as error:                       # the kernel died, or a cell timed out
             details.append(f"**Stopped:** {type(error).__name__}: {error}")
-        minutes = (time.time() - start) / 60
+        minutes = (time.perf_counter() - start) / 60
         (RUNS / "executed").mkdir(parents=True, exist_ok=True)
         nbformat.write(nb, RUNS / "executed" / path.name)
         errors, cells = [], []

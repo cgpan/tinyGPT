@@ -11,7 +11,8 @@ STEPS = ["## 1 · Predict", "## 2 · Run", "## 3 · Investigate", "## 4 · Modif
 
 
 def cells(path, kind):
-    return ["".join(c["source"]) for c in json.loads(path.read_text())["cells"] if c["cell_type"] == kind]
+    notebook = json.loads(path.read_text(encoding="utf-8"))
+    return ["".join(c["source"]) for c in notebook["cells"] if c["cell_type"] == kind]
 
 
 def test_there_are_notebooks():
@@ -26,7 +27,7 @@ def test_every_notebook_starts_with_the_same_setup_cell():
 
 @pytest.mark.parametrize("path", NOTEBOOKS, ids=lambda p: p.stem)
 def test_outputs_are_cleared_so_predictions_are_not_spoiled(path):
-    for cell in json.loads(path.read_text())["cells"]:
+    for cell in json.loads(path.read_text(encoding="utf-8"))["cells"]:
         if cell["cell_type"] == "code":
             assert cell["outputs"] == [] and cell["execution_count"] is None
 

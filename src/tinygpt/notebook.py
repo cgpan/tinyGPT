@@ -111,7 +111,8 @@ def run_tests(bug=None):
     if bug:
         # these check the bug-planting and the exercise solutions, which need tinyGPT without a bug
         command += ["--ignore=tests/test_bugs.py", "--ignore=tests/test_solutions.py"]
-    done = subprocess.run(command, capture_output=True, text=True, env=dict(os.environ, TINYGPT_BUG=bug or ""))
+    env = dict(os.environ, TINYGPT_BUG=bug or "", PYTHONIOENCODING="utf-8", PYTHONUTF8="1")
+    done = subprocess.run(command, capture_output=True, text=True, encoding="utf-8", errors="replace", env=env)
     print(f"--- tests with the {bug} bug planted (leaving out the tests of the bugs and of the solutions) ---"
           if bug else "--- tests on tinyGPT as it is ---")
     print((done.stdout or done.stderr).strip())

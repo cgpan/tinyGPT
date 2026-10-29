@@ -61,9 +61,9 @@ def train(cfg, model=None, data=None, device=None, save_path=None, step_fn=train
         print("warning: no GPU found, and a model this size trains slowly on a CPU. See the README.")
 
     history = []
-    start = time.time()
+    start = time.perf_counter()
     for step in range(cfg.max_iters + 1):
-        minutes = (time.time() - start) / 60
+        minutes = (time.perf_counter() - start) / 60
         last = step == cfg.max_iters or minutes > cfg.max_minutes
         if step % cfg.eval_interval == 0 or last:
             row = {"step": step,

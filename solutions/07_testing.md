@@ -14,7 +14,7 @@ def test_position_matters():
     model = tinygpt.GPT(cfg).eval()
     same = torch.full((1, 8), 5)                  # one character, eight times
     logits, _ = model(same)
-    assert not torch.allclose(logits[0, 0], logits[0, -1])
+    assert not torch.allclose(logits[0, 0], logits[0, -1], atol=1e-3)
 
 tinygpt.check.catches(test_position_matters, bug="no_position")
 ```
@@ -24,10 +24,18 @@ tinygpt.check.catches(test_position_matters, bug="no_position")
 Without the position table, every copy of the character starts as the same vector. The
 first position can only attend to itself; the last attends to eight identical copies, and
 a weighted average of identical vectors is that same vector again. So every position ends
-up with exactly the same scores, and `torch.allclose` says they are equal: the test fails.
+up with the same scores (up to rounding), and `torch.allclose` says they are equal: the
+test fails.
 
 With the position table, each copy gets a different position vector added, so the scores
 differ and the test passes.
+
+**Why `atol=1e-3`.** Computers round. Even without the position table, the first and last
+scores can differ in the seventh decimal place, by different amounts on different
+machines, and the default `allclose` is strict enough to call that "different". With the
+table the scores differ by about 0.3, so a tolerance of 0.001 separates the two cases with
+plenty of room either side. Never test floating-point numbers for exact equality unless
+you are sure the computation is bit-for-bit identical.
 
 This test checks a **property** (position changes the output) rather than an exact number,
 so it doesn't break when the model's starting weights change. Compare it with

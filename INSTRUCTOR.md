@@ -123,7 +123,12 @@ The numbers students should see (all measured), and where they tend to get stuck
 
 - `base`: 10,739,777 parameters. Validation 1.49 at step 2,500 (training 1.21); it
   passes 2.48 at about step 250.
-- The 6 to 8 minutes on a T4 is an estimate. Time one run before you share the chapter.
+- Measured training time for `base`: 1.9 minutes on an NVIDIA RTX 4070 SUPER (Windows)
+  and 4.1 minutes on an Apple M5 Max. On a Colab T4 it is still an estimate (6 to 8
+  minutes); time one run there before you share the chapter. The whole chapter took 7 and
+  11 minutes on those two machines.
+- Validation loss at step 2,500 across our runs: 1.49 to 1.52 (dropout makes each run a
+  little different).
 - Feed-forward holds two-thirds of the parameters (7.09M of 10.74M); attention one-third.
 - `small` ablations (2,000 steps): one block 1.76, two blocks 1.70, four blocks 1.69.
   Without positional embeddings: 1.81. Dropout 0.2: about 1.83 to 1.85 (training about
@@ -182,10 +187,20 @@ The numbers students should see (all measured), and where they tend to get stuck
 - Measured for tinyGPT (`base`, 3,000 steps): 1.486 nats per character on the whole
   validation text, read in 128-character windows, and 1.88 on the modern-English example
   in Modify A.
-- **GPT-2's numbers are not measured yet.** The environment this was built in could not
-  reach huggingface.co, so the chapter states no GPT-2 results; students measure them.
-  Before sharing, run the chapter once and write GPT-2's per-token and per-character
-  numbers here.
+- GPT-2, measured on Windows and macOS (the same on both): **4.00 nats per token, 1.29
+  per character** on the validation text. One GPT-2 token covers 3.09 characters of our
+  Shakespeare; the Romeo line is 16 GPT-2 tokens. So GPT-2 looks almost as bad as knowing
+  nothing per token (4.00 against 4.17), yet beats tinyGPT (1.49 to 1.51) per character.
+  That is the units trap, and the reason the chapter exists.
+- On the modern-English example in Modify A: GPT-2 0.73 per character, tinyGPT 1.88 to 1.99.
+- GPT-2 was most surprised by the start of the play format: 10.1 nats for "EO" in
+  "ROMEO" and 11.7 for "But" at the start of a line. Passages dense with speaker names
+  are the likeliest place for tinyGPT to win the "going further" challenge; we haven't
+  searched for one.
+- **Content warning.** GPT-2 learned from unfiltered web pages. In one of our test runs,
+  its first sample at temperature 1.0 was sexually explicit. GPT-2's writing now appears
+  only in Modify B, with a warning; delete that cell if you'd rather students not see
+  unfiltered output.
 - The comparison code was tested with a small, untrained GPT-2 built locally from the
   same `transformers` classes, and `load_gpt2` was tested loading from a local folder.
 - Text pasted into Modify A often has curly quotes (’ “ ”), which tinyGPT can't read.

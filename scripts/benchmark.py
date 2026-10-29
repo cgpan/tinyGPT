@@ -28,11 +28,11 @@ def seconds_per_step(cfg, train_ids, device, warmup=3, steps=10):
     for i in range(warmup + steps):
         if i == warmup:
             wait_for(device)
-            start = time.time()
+            start = time.perf_counter()
         x, y = get_batch(train_ids, cfg.block_size, cfg.batch_size, device)
         train_step(model, x, y, optimizer)
     wait_for(device)
-    return (time.time() - start) / steps, count_params(model)
+    return (time.perf_counter() - start) / steps, count_params(model)
 
 
 def main():

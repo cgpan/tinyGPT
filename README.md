@@ -5,8 +5,8 @@ write Shakespeare-like text from one 1 MB file. No `transformers` library. Every
 of the model, including the attention code, is in this repository and meant to be read.
 
 > **Status:** in progress. The package, its tests, the measured numbers below, and
-> all eight chapters are written. Still to do: measuring GPT-2's numbers for chapter 8,
-> and testing on a Mac and a Windows PC.
+> all eight chapters are written, and everything has been run on Windows (NVIDIA GPU),
+> macOS (Apple Silicon) and Linux. Still to do: a check on Colab's T4 GPU.
 
 ```
 ROMEO:
@@ -31,6 +31,7 @@ nats. Lower is better.
 | counting bigram | **2.48** | 12.0 | count which character follows which; ~30 lines of NumPy |
 | tinyGPT `small` (0.8M parameters) | **1.69** | 5.4 | 2,000 training steps |
 | tinyGPT `base` (10.7M parameters) | **1.49** | 4.4 | 2,500 training steps |
+| GPT-2 small (124M parameters), for comparison | 1.29 | 3.6 | trained on about 40 GB of web text; per character (chapter 8) |
 
 Every number in this table was measured by running the code in this repository
 (see [How these numbers were measured](#how-these-numbers-were-measured)).
@@ -112,15 +113,17 @@ print(tinygpt.sample(model, tok, prompt="ROMEO:", length=300))
 Every run stops by itself after `max_minutes` (9 minutes), so no run goes past
 10 minutes on any machine. On slower hardware the run stops early with a higher loss.
 
-| config | parameters | steps | this CPU (measured) | Colab T4 (estimate) | NVIDIA RTX 30/40 (estimate) | Apple M1/M2 (estimate) | Apple M Pro/Max (estimate) |
+| config | parameters | steps | NVIDIA RTX 4070 SUPER | Apple M5 Max | 4-core CPU | Colab T4 | Apple M1/M2 |
 |---|---|---|---|---|---|---|---|
-| `tiny` | 0.11M | 200 | 6 s | under 1 min | under 1 min | under 1 min | under 1 min |
-| `small` | 0.82M | 2,000 | 2.3 min | about 1 min | under 1 min | 1–2 min | about 1 min |
-| `base` | 10.7M | 2,500 | about 1 h 50 min | 6–8 min | 2–4 min | stops at the 9-min limit, around step 900–1,500 | 5–9 min |
+| `tiny` | 0.11M | 200 | under 1 min | under 1 min | 6 s | under 1 min | under 1 min |
+| `small` | 0.82M | 2,000 | 0.6 min | 0.6 min | 2.3 min | about 1 min | 1–2 min |
+| `base` | 10.7M | 2,500 | **1.9 min** | **4.1 min** | about 1 h 50 min | 6–8 min | stops at the 9-min limit, around step 900–1,500 |
+| | | | measured | measured | measured | estimate | estimate |
 
-The estimates scale this CPU's measured speed by each chip's typical compute and memory
-speed. They are rough. `python scripts/benchmark.py` times 10 real steps on your machine
-and prints a projection in about a minute.
+The first three columns were measured with `scripts/verify.py` (Windows 11, PyTorch
+2.15 with CUDA; macOS with PyTorch's MPS backend; Linux, no GPU). The last two are
+estimates, scaled by each chip's typical speed. `python scripts/benchmark.py` times 10
+real steps on your machine and prints a projection in about a minute.
 
 A `base` run that stops early still gets most of the way: validation loss is already
 1.56 at step 1,500 and 1.51 at step 1,750 (see the curve below). On a base M1/M2/M3

@@ -18,3 +18,4 @@ tinygpt = ["shakespeare.txt"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+filterwarnings = ["ignore:FigureCanvasAgg is non-interactive:UserWarning"]

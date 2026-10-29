@@ -39,7 +39,7 @@ def load_config(path, **overrides):
 
     >>> cfg = load_config("configs/small.yaml", n_layer=1)
     """
-    with open(path) as f:
+    with open(path, encoding="utf-8") as f:
         values = yaml.safe_load(f) or {}
     values.update(overrides)
     return Config(**values)

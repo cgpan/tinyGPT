@@ -53,7 +53,7 @@ def test_every_bug_has_a_description():
 def test_catches_check(capsys):
     def position_test():
         logits, _ = tiny_gpt()(torch.full((1, 8), 5))       # one character, eight times
-        assert not torch.allclose(logits[0, 0], logits[0, -1])
+        assert not torch.allclose(logits[0, 0], logits[0, -1], atol=1e-3)
 
     check.catches(position_test, bug="no_position")
     assert capsys.readouterr().out.startswith("✓")

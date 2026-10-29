@@ -24,7 +24,7 @@ def notebook_names():
 
 @pytest.mark.parametrize("path", SOLUTIONS, ids=lambda p: p.stem)
 def test_solution_passes_its_checks(path, notebook_names):
-    blocks = re.findall(r"```python\n(.*?)```", path.read_text(), re.DOTALL)
+    blocks = re.findall(r"```python\n(.*?)```", path.read_text(encoding="utf-8"), re.DOTALL)
     assert blocks
     names = dict(notebook_names)
     out = io.StringIO()

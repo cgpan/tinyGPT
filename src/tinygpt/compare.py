@@ -7,6 +7,7 @@ or GPT-2 with its word pieces.
 import importlib
 import subprocess
 import sys
+import warnings
 
 import torch
 from torch.nn import functional as F
@@ -24,7 +25,13 @@ def load_gpt2(device=None):
         print("Installing the transformers library first...")
         subprocess.run([sys.executable, "-m", "pip", "install", "-q", "transformers"], check=True)
         importlib.invalidate_caches()
-    from transformers import AutoModelForCausalLM, AutoTokenizer
+    with warnings.catch_warnings():                  # notes meant for library developers, not for us
+        warnings.simplefilter("ignore")
+        from huggingface_hub.utils import logging as hub_logging
+        from transformers import AutoModelForCausalLM, AutoTokenizer
+        from transformers.utils import logging as transformers_logging
+    hub_logging.set_verbosity_error()
+    transformers_logging.set_verbosity_error()
 
     tokenizer = AutoTokenizer.from_pretrained(GPT2)
     tokenizer.model_max_length = 10**9  # we cut long texts into windows ourselves

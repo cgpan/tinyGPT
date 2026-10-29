@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest
@@ -220,7 +222,7 @@ def test_on_your_own_computer_the_model_stays_in_runs(tmp_path, monkeypatch, cap
     monkeypatch.chdir(tmp_path)
     save_tiny_model(tmp_path / "runs/base/model.pt")
     tinygpt.keep_model()
-    assert "runs/base/model.pt" in capsys.readouterr().out
+    assert str(Path("runs") / "base" / "model.pt") in capsys.readouterr().out
     model, tok, history = tinygpt.load_kept_model()
     assert history[-1]["step"] == 5 and tok.vocab_size == 65
 
