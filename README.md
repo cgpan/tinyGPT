@@ -5,7 +5,7 @@ write Shakespeare-like text from one 1 MB file. No `transformers` library. Every
 of the model, including the attention code, is in this repository and meant to be read.
 
 > **Status:** Milestone 3 of 4. The package, its tests, the measured numbers below, and
-> chapters 1 to 5 are done. The last chapters come next.
+> chapters 1 to 6 are done. The last chapters come next.
 
 ```
 ROMEO:
@@ -46,7 +46,8 @@ part moves the number.
 | 3 | [Learning instead of counting](notebooks/03_learning.ipynb) [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/cgpan/tinyGPT/blob/main/notebooks/03_learning.ipynb) | one training step | 4.17 → 2.48, by learning | no |
 | 4 | [Looking back: attention](notebooks/04_attention.ipynb) [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/cgpan/tinyGPT/blob/main/notebooks/04_attention.ipynb) | one attention head | 2.48 → 1.76 | recommended |
 | 5 | [The full run](notebooks/05_full_run.ipynb) [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/cgpan/tinyGPT/blob/main/notebooks/05_full_run.ipynb) | one transformer block | 1.76 → 1.49 | yes |
-| 6–8 | *coming next* | | | |
+| 6 | [Talking to your model](notebooks/06_talking.ipynb) [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/cgpan/tinyGPT/blob/main/notebooks/06_talking.ipynb) | the writing loop | 1.49, and what temperature does to it | only to retrain |
+| 7–8 | *coming next* | | | |
 
 Every chapter follows the same five steps: **Predict** what will happen, **Run** it,
 **Investigate** the code that ran, **Modify** one thing and explain the result, and,

@@ -33,3 +33,14 @@ def sample(model, tok, prompt="\n", length=500, temperature=1.0, top_k=None, see
     idx = torch.tensor([tok.encode(prompt)], dtype=torch.long, device=device)
     out = generate(model, idx, length, temperature, top_k)
     return tok.decode(out[0].tolist())
+
+
+def longest_copy(text, source):
+    """The longest piece of `text` that also appears, character for character, in `source`."""
+    best = ""
+    for start in range(len(text)):
+        end = start + len(best) + 1                # only look for something longer than the best so far
+        while end <= len(text) and text[start:end] in source:
+            best = text[start:end]
+            end += 1
+    return best

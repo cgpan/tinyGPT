@@ -121,3 +121,19 @@ The numbers students should see (all measured), and where they tend to get stuck
   machine. Expect students' numbers to differ from these by a few hundredths.
 - Make, part 1: each block has 12d² + 10d parameters. Part 2 has no fixed answer.
 - In Colab the trained model in `runs/base/model.pt` disappears when the session ends.
+
+### Chapter 6 · Talking to your model (GPU only if the model must be retrained)
+
+- Students load the model they kept at the end of chapter 5: from Google Drive
+  (`MyDrive/tinyGPT/model.pt`) on Colab, from `runs/base/model.pt` on their own computer.
+  If none is found, the chapter trains one first.
+- Measured with our `base` model (3,000 steps, validation 1.50), averaged over 10
+  batches: validation loss at temperature 0.5 is 2.07, at 1.0 1.49, at 1.2 1.46, at 1.3
+  1.45 (the best), at 2.0 1.58. On *training* text the best temperature is exactly 1.0. The model is overconfident on new text because it has
+  partly memorised its training text. This is a calibration result; it surprised us too.
+- Greedy writing (`top_k=1`) gets stuck in a loop ("the way of the way of the way").
+  Temperature 0.1 is nearly the same; 2.0 is gibberish.
+- Longest piece copied from the training text, in 1,000 characters: 15 to 24 characters
+  at temperature 1.0, 23 to 34 at 0.5; mostly speaker names such as `LADY ANNE:`. The
+  counting bigram's longest is 8.
+- Writing 300 characters takes about 4 seconds on a CPU.

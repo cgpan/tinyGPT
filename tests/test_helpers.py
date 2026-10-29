@@ -19,6 +19,13 @@ def test_show_prints_the_real_source(capsys):
     assert "class CharTokenizer" in out
 
 
+def test_show_names_the_right_file_for_a_decorated_function(capsys):
+    tinygpt.show(tinygpt.generate)                  # wrapped by @torch.no_grad()
+    out = capsys.readouterr().out
+    assert out.startswith("# from tinygpt/sampling.py")
+    assert "@torch.no_grad()" in out
+
+
 def test_print_setup_names_the_hardware(capsys):
     tinygpt.print_setup()
     assert "tinyGPT" in capsys.readouterr().out
@@ -170,3 +177,72 @@ def test_param_count_check(capsys):
     assert capsys.readouterr().out.startswith("✓")
     check.param_count(lambda vocab_size, block_size, n_layer, n_embd: 12 * n_layer * n_embd ** 2)
     assert "off by" in capsys.readouterr().out
+
+
+def test_longest_copy():
+    assert tinygpt.longest_copy("xx my lord, yy", "O my lord, sir") == " my lord, "
+    assert tinygpt.longest_copy("zzz", "abc") == ""
+
+
+def test_greedy_check(capsys):
+    import torch
+
+    def greedy(model, idx, n):
+        for _ in range(n):
+            logits, _ = model(idx[:, -model.cfg.block_size:])
+            idx = torch.cat([idx, logits[:, -1, :].argmax(-1, keepdim=True)], dim=1)
+        return idx
+
+    def uncropped(model, idx, n):
+        for _ in range(n):
+            logits, _ = model(idx)
+            idx = torch.cat([idx, logits[:, -1, :].argmax(-1, keepdim=True)], dim=1)
+        return idx
+
+    check.greedy(greedy)
+    assert capsys.readouterr().out.startswith("✓")
+    check.greedy(uncropped)
+    assert "last block_size characters" in capsys.readouterr().out
+    check.greedy(lambda model, idx, n: idx)
+    assert "should have shape (2, 15)" in capsys.readouterr().out
+
+
+# --- keeping the model between chapters ---------------------------------------------
+
+def save_tiny_model(path):
+    cfg = tinygpt.Config(vocab_size=65, block_size=8, n_layer=1, n_head=2, n_embd=16)
+    tok = tinygpt.CharTokenizer.from_text(tinygpt.load_text())
+    history = [{"step": 5, "train_loss": 3.0, "val_loss": 3.1, "minutes": 0.1}]
+    tinygpt.save_checkpoint(path, tinygpt.GPT(cfg), tok, cfg, history)
+
+
+def test_on_your_own_computer_the_model_stays_in_runs(tmp_path, monkeypatch, capsys):
+    monkeypatch.chdir(tmp_path)
+    save_tiny_model(tmp_path / "runs/base/model.pt")
+    tinygpt.keep_model()
+    assert "runs/base/model.pt" in capsys.readouterr().out
+    model, tok, history = tinygpt.load_kept_model()
+    assert history[-1]["step"] == 5 and tok.vocab_size == 65
+
+
+def test_on_colab_the_model_goes_to_google_drive(tmp_path, monkeypatch, capsys):
+    import sys
+    import types
+
+    from tinygpt import notebook
+
+    drive_root = tmp_path / "drive"
+    mounted = []
+    fake_drive = types.SimpleNamespace(mount=lambda where: (mounted.append(where), (drive_root / "MyDrive").mkdir(parents=True)))
+    monkeypatch.setitem(sys.modules, "google.colab", types.SimpleNamespace(drive=fake_drive))
+    monkeypatch.setattr(notebook, "DRIVE", drive_root)
+    monkeypatch.chdir(tmp_path)
+    save_tiny_model(tmp_path / "runs/base/model.pt")
+
+    tinygpt.keep_model()
+    assert mounted == [str(drive_root)]
+    assert (drive_root / "MyDrive/tinyGPT/model.pt").exists()
+    (tmp_path / "runs/base/model.pt").unlink()             # a new Colab session: the local copy is gone
+    model, tok, history = tinygpt.load_kept_model()
+    assert history[-1]["val_loss"] == 3.1
+    assert mounted == [str(drive_root)]                     # already mounted: not asked twice

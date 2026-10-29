@@ -1,13 +1,20 @@
 """Small helpers for the chapter notebooks."""
 
 import inspect
+import shutil
+import sys
 import textwrap
 from importlib import metadata
 from pathlib import Path
 
 import torch
 
-from tinygpt.config import get_device
+from tinygpt.checkpoint import load_checkpoint
+from tinygpt.config import get_device, load_config
+from tinygpt.training import train
+
+MODEL_PATH = Path("runs/base/model.pt")     # where chapter 5 saves the full model
+DRIVE = Path("/content/drive")              # where Colab mounts Google Drive
 
 
 def show(obj):
@@ -15,6 +22,7 @@ def show(obj):
 
     This is the code that actually runs when you call it, not a copy.
     """
+    obj = inspect.unwrap(obj)                    # see through decorators such as @torch.no_grad()
     source = textwrap.dedent(inspect.getsource(obj))
     path = Path(inspect.getsourcefile(obj))
     header = f"# from tinygpt/{path.name}\n\n"
@@ -42,3 +50,42 @@ def print_setup():
     if device == "cpu":
         print("No GPU found. Chapters 1 to 4 work without one (3 and 4 just run more slowly);\n"
               "chapter 5 needs one. In Colab: Runtime > Change runtime type > T4 GPU, then run this cell again.")
+
+
+def _kept_path():
+    """Google Drive on Colab, where files outlive the session; the runs/ folder anywhere else."""
+    if "google.colab" not in sys.modules:
+        return MODEL_PATH
+    if not (DRIVE / "MyDrive").exists():
+        from google.colab import drive
+        drive.mount(str(DRIVE))                 # Colab asks for permission the first time
+    return DRIVE / "MyDrive" / "tinyGPT" / "model.pt"
+
+
+def keep_model(path=MODEL_PATH):
+    """Keep a trained model where the next chapter can find it.
+
+    On Colab, everything on the virtual machine disappears when the session ends, so the
+    model is copied to your Google Drive. On your own computer it is already safe on disk.
+    """
+    target = _kept_path()
+    if Path(path).resolve() != target.resolve():
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(path, target)
+    print(f"Your model is kept in {target}")
+
+
+def load_kept_model():
+    """Load the model chapter 5 kept: returns (model, tokenizer, history).
+
+    If there isn't one, train it first with configs/base.yaml (6 to 8 minutes on a T4).
+    """
+    path = _kept_path()
+    if not path.exists():
+        print(f"No model found at {path}, so training one now with configs/base.yaml.")
+        train(load_config("configs/base.yaml"), save_path=MODEL_PATH)
+        keep_model(MODEL_PATH)
+    model, tok, history = load_checkpoint(path)
+    last = history[-1]
+    print(f"Loaded {path}: trained for {last['step']:,} steps, validation loss {last['val_loss']:.2f}.")
+    return model, tok, history

@@ -20,6 +20,10 @@ from tinygpt.training import train_step as reference_train_step
 
 
 def _short(value, limit=40):
+    if isinstance(value, torch.nn.Module):
+        return type(value).__name__
+    if isinstance(value, torch.Tensor) and value.dim() > 0:
+        return f"tensor of shape {tuple(value.shape)}"
     text = repr(value)
     return text if len(text) <= limit else text[: limit - 3] + "..."
 
@@ -216,4 +220,39 @@ def _param_count_problem(fn):
             off = f", off by {got - want:+,}" if isinstance(got, (int, float)) else ""
             return (f"for vocab_size={vocab_size}, block_size={block_size}, n_layer={n_layer}, n_embd={n_embd} "
                     f"the model has {want:,} parameters, but your formula gives {_short(got)}{off}.")
+    return None
+
+
+def greedy(fn):
+    """fn(model, idx, max_new_tokens) -> idx with max_new_tokens characters added, each the likeliest next one."""
+    _report(_greedy_problem(fn),
+            "Your loop writes exactly what tinyGPT's does. You built the writing half of a language model.")
+
+
+def _greedy_problem(fn):
+    from tinygpt.model import GPT
+    from tinygpt.sampling import generate
+
+    torch.manual_seed(0)
+    model = GPT(Config(vocab_size=65, block_size=8, n_layer=1, n_head=2, n_embd=16, dropout=0.0)).eval()
+    idx = torch.randint(0, 65, (2, 3))
+    want = generate(model, idx, 12, top_k=1)          # 15 characters, more than block_size: needs cropping
+    got, error = _call(fn, model, idx, 12)
+    if error:
+        if "block_size" in error:
+            error += ". Give the model only the last block_size characters: idx[:, -model.cfg.block_size:]."
+        return error
+    if not isinstance(got, torch.Tensor):
+        return f"your function returned {_short(got)}; return the tensor of character ids."
+    if got.shape != want.shape:
+        return (f"the result should have shape {tuple(want.shape)}: each of the 2 rows keeps its 3 starting "
+                f"characters and gains 12 new ones. Yours has shape {tuple(got.shape)}.")
+    if not torch.equal(got[:, :3], idx):
+        return "the result should start with the characters you were given."
+    wrong = (got != want).nonzero()
+    if len(wrong):
+        row, col = wrong[0].tolist()
+        return (f"new character {col - 2} in row {row} should be {int(want[row, col])}, the likeliest, but yours "
+                f"is {int(got[row, col])}. Use only the scores at the last position, logits[:, -1, :], and "
+                f"pick the biggest with torch.argmax.")
     return None
