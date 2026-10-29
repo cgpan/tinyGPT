@@ -112,9 +112,12 @@ The numbers students should see (all measured), and where they tend to get stuck
 - The 6 to 8 minutes on a T4 is an estimate. Time one run before you share the chapter.
 - Feed-forward holds two-thirds of the parameters (7.09M of 10.74M); attention one-third.
 - `small` ablations (2,000 steps): one block 1.76, two blocks 1.70, four blocks 1.69.
-  Without positional embeddings: 1.81. Dropout 0.2: 1.83 (training 1.68), worse than
-  none: it narrows the gap between training and validation loss a little, but a small
-  model trained this briefly loses more from it than it gains. `base` uses dropout 0.2
-  because a 10.7M-parameter model memorises far more.
+  Without positional embeddings: 1.81. Dropout 0.2: about 1.83 to 1.85 (training about
+  1.67), worse than none: it narrows the gap between training and validation loss a
+  little, but a small model trained this briefly loses more from it than it gains. `base`
+  uses dropout 0.2 because a 10.7M-parameter model memorises far more.
+- Runs with dropout don't repeat exactly: two of our runs of the same dropout setting
+  gave 1.83 and 1.85. Runs without dropout repeated to four decimal places on the same
+  machine. Expect students' numbers to differ from these by a few hundredths.
 - Make, part 1: each block has 12d² + 10d parameters. Part 2 has no fixed answer.
 - In Colab the trained model in `runs/base/model.pt` disappears when the session ends.
