@@ -145,7 +145,7 @@ src/tinygpt/          the package: everything you import
 notebooks/            the chapters
 solutions/            worked solutions to each chapter's Make challenge
 configs/              tiny.yaml, small.yaml, base.yaml
-scripts/              train.py, sample.py, benchmark.py
+scripts/              train.py, sample.py, benchmark.py, verify.py (check a machine end to end)
 tests/                pytest suite; runs in seconds on a CPU
 INSTRUCTOR.md         notes for teaching with it
 ```

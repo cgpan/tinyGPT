@@ -13,6 +13,20 @@ in Colab or on their own GPU machine. This page is for you.
 - [ ] **From chapter 3 on, check the training times.** Run `python scripts/benchmark.py`
       once on a Colab T4, and on a Mac if you have one.
 
+### Checking it on your own machine
+
+`scripts/verify.py` runs everything: the tests, the benchmark, the three training configs,
+and every chapter notebook from top to bottom (chapter 8 downloads GPT-2). It writes
+`runs/report-<computer name>.md`. Nothing in the repository is changed.
+
+```bash
+python -m pip install -e . nbclient nbformat ipykernel transformers
+python scripts/verify.py
+```
+
+Install a GPU build of PyTorch first. It takes about 20 to 40 minutes with a GPU;
+`--quick` takes a minute or two.
+
 ### Testing in Colab while the repository is private
 
 Add a GitHub token with read access to this repository to Colab's Secrets panel (the key
