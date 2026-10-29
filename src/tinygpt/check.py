@@ -256,3 +256,30 @@ def _greedy_problem(fn):
                 f"is {int(got[row, col])}. Use only the scores at the last position, logits[:, -1, :], and "
                 f"pick the biggest with torch.argmax.")
     return None
+
+
+def _test_problem(test):
+    """Run a test function; None if it passes, otherwise what went wrong."""
+    try:
+        test()
+    except AssertionError as error:
+        return f"AssertionError{': ' + str(error) if str(error) else ''}"
+    except Exception as error:
+        return f"{type(error).__name__}: {error}"
+    return None
+
+
+def catches(test, bug):
+    """Does your test pass on tinyGPT as it is, and fail once `bug` is planted?"""
+    from tinygpt.bugs import BUGS, planted
+
+    if bug not in BUGS:
+        raise ValueError(f"no bug called {bug!r}; choose from: {', '.join(BUGS)}")
+    problem = _test_problem(test)
+    if problem:
+        _report(f"{test.__name__} fails on tinyGPT as it is, so it would blame correct code: {problem}", "")
+        return
+    with planted(bug):
+        problem = _test_problem(test)
+    _report(None if problem else f"{test.__name__} still passes with the {bug} bug planted, so it doesn't catch it.",
+            f"{test.__name__} passes on correct code and catches the {bug} bug ({problem}).")

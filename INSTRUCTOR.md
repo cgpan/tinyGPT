@@ -137,3 +137,25 @@ The numbers students should see (all measured), and where they tend to get stuck
   at temperature 1.0, 23 to 34 at 0.5; mostly speaker names such as `LADY ANNE:`. The
   counting bigram's longest is 8.
 - Writing 300 characters takes about 4 seconds on a CPU.
+
+### Chapter 7 · How do you know it works? (no GPU needed)
+
+- The five planted bugs, and the tests that catch them:
+  - `no_mask` and `softmax_wrong_way`: `test_attention_cannot_see_the_future` and
+    `test_attention_weights_look_only_backwards_and_sum_to_one`.
+  - `no_shift`: the two batch tests in `tests/test_data.py`.
+  - `big_init`: `test_untrained_gpt_loss_is_close_to_uniform_guessing`. The untrained
+    `small` model starts at about 27 instead of 4.2.
+  - `no_position`: none. Yet it costs a lot: the one-block model reaches 2.38 instead
+    of 1.76. The Make challenge is to write the test that catches it.
+- With `no_shift` the one-block model's loss falls to 0.000 within 250 steps, and it
+  writes nothing but colons.
+- A run of the suite takes 5 to 10 seconds. The clean run has 114 tests. Runs with a bug
+  planted leave out the tests of the bug-planting and of the solutions, which need
+  tinyGPT without a bug, so they have 102.
+- Modify B suits a "coding with AI" lesson: students ask an AI assistant for a test, then
+  check whether it really fails when the bug is planted. The example test in the cell
+  only checks shapes, and doesn't catch the bug.
+- Bugs are planted with `tinygpt.bugs.planted(...)` inside a `with` block, and removed
+  when the block ends. `tinygpt.run_tests(bug=...)` plants one for a whole run of the
+  suite, in a separate process.

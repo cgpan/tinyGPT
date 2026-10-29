@@ -1,7 +1,9 @@
 """Small helpers for the chapter notebooks."""
 
 import inspect
+import os
 import shutil
+import subprocess
 import sys
 import textwrap
 from importlib import metadata
@@ -18,14 +20,16 @@ DRIVE = Path("/content/drive")              # where Colab mounts Google Drive
 
 
 def show(obj):
-    """Display the source code of a tinygpt function or class: the chapter's open box.
+    """Display the source code of a tinygpt function or class, or of a file: the chapter's open box.
 
     This is the code that actually runs when you call it, not a copy.
     """
-    obj = inspect.unwrap(obj)                    # see through decorators such as @torch.no_grad()
-    source = textwrap.dedent(inspect.getsource(obj))
-    path = Path(inspect.getsourcefile(obj))
-    header = f"# from tinygpt/{path.name}\n\n"
+    if isinstance(obj, (str, Path)):
+        source, header = Path(obj).read_text(encoding="utf-8"), f"# {obj}\n\n"
+    else:
+        obj = inspect.unwrap(obj)                # see through decorators such as @torch.no_grad()
+        source = textwrap.dedent(inspect.getsource(obj))
+        header = f"# from tinygpt/{Path(inspect.getsourcefile(obj)).name}\n\n"
     try:
         from IPython import get_ipython
         from IPython.display import Code, display
@@ -89,3 +93,25 @@ def load_kept_model():
     last = history[-1]
     print(f"Loaded {path}: trained for {last['step']:,} steps, validation loss {last['val_loss']:.2f}.")
     return model, tok, history
+
+
+def run_tests(bug=None):
+    """Run tinyGPT's tests with pytest, optionally with one deliberate bug planted.
+
+    The tests run in a separate Python process, so a planted bug never reaches the
+    notebook. The bugs are listed in tinygpt.bugs.BUGS.
+    """
+    from tinygpt.bugs import BUGS
+
+    if bug is not None and bug not in BUGS:
+        raise ValueError(f"no bug called {bug!r}; choose from: {', '.join(BUGS)}")
+    if not Path("tests").is_dir():
+        raise FileNotFoundError("No tests/ folder here. Run the setup cell first: it moves into the tinyGPT folder.")
+    command = [sys.executable, "-m", "pytest", "-q", "--tb=no", "-rf", "--color=no", "-p", "no:cacheprovider", "tests"]
+    if bug:
+        # these check the bug-planting and the exercise solutions, which need tinyGPT without a bug
+        command += ["--ignore=tests/test_bugs.py", "--ignore=tests/test_solutions.py"]
+    done = subprocess.run(command, capture_output=True, text=True, env=dict(os.environ, TINYGPT_BUG=bug or ""))
+    print(f"--- tests with the {bug} bug planted (leaving out the tests of the bugs and of the solutions) ---"
+          if bug else "--- tests on tinyGPT as it is ---")
+    print((done.stdout or done.stderr).strip())

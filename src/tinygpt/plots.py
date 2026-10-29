@@ -48,11 +48,13 @@ def scoreboard(results=None):
         print(f"  {value:5.2f}  {name:<32} {kind}")
 
     plt, fig, ax = _axes((9, 2.8))
-    ax.set_xlim(4.5, 1.0)                       # worst on the left: progress moves right
+    low = min([1.0, *(v - 0.3 for v in results.values())])
+    high = max([4.5, *(v + 0.3 for v in results.values())])
+    ax.set_xlim(high, low)                      # worst on the left: progress moves right
     ax.set_ylim(-1.2, 1.4)
     ax.set_yticks([])
     ax.spines["bottom"].set_position(("data", 0))
-    ax.set_xticks([4, 3, 2, 1])
+    ax.set_xticks(range(math.floor(high), math.ceil(low) - 1, -1))
     for name, value in LANDMARKS.items():
         ax.plot([value, value], [-0.12, 0.12], color=MUTED, lw=1)
         ax.text(value, -0.3, f"{name}\n{value:.2f}", ha="center", va="top", fontsize=9, color=INK_2)
