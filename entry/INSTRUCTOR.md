@@ -19,6 +19,8 @@ in Colab or on their own GPU machine. This page is for you.
 and every chapter notebook from top to bottom (chapter 8 downloads GPT-2). It writes
 `runs/report-<computer name>.md`. Nothing in the repository is changed.
 
+Run these from the `entry` folder:
+
 ```bash
 python -m pip install -e . nbclient nbformat ipykernel transformers
 python scripts/verify.py
