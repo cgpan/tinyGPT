@@ -55,8 +55,9 @@ def train_step(model, optimizer, batches, scaler, device, dtype=None, grad_clip=
 def save_checkpoint(path, model, optimizer, scaler, generator, step, best_val, cfg):
     """Save everything needed to carry on exactly where training stopped: the model's and the
     optimizer's state, the scaler's state, the batch generator's state, PyTorch's random
-    state (dropout draws from it; on a GPU, save torch.cuda.get_rng_state_all() too), the step,
-    the best validation loss so far, and the config as a dict.
+    state (dropout draws from it; with a GPU, also torch.cuda.get_rng_state_all() or
+    torch.mps.get_rng_state()), the step, the best validation loss so far, and the config
+    as a dict.
 
     Write to a temporary file next to path first, then os.replace it onto path: if the run
     is cut off while saving, the old checkpoint is still whole.

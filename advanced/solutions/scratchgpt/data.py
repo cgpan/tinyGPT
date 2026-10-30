@@ -171,7 +171,8 @@ def build_splits(reviews, val_fraction=0.1, seed=0, threshold=0.8):
     documents in each split ("train", "val", "test").
     """
     # BEGIN SOLUTION 1
-    stats = defaultdict(int)
+    stats = dict.fromkeys(["reviews", "email", "url", "phone", "exact_duplicates", "near_duplicates",
+                           "contaminated"], 0)
     train, held_out = [], []
     for review in reviews:
         stats["reviews"] += 1
@@ -220,5 +221,5 @@ def build_splits(reviews, val_fraction=0.1, seed=0, threshold=0.8):
     }
     for name, docs in splits.items():
         stats[name] = len(docs)
-    return splits, dict(stats)
+    return splits, stats
     # END SOLUTION

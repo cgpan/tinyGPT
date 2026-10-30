@@ -89,8 +89,9 @@ def train_step(model, optimizer, batches, scaler, device, dtype=None, grad_clip=
 def save_checkpoint(path, model, optimizer, scaler, generator, step, best_val, cfg):
     """Save everything needed to carry on exactly where training stopped: the model's and the
     optimizer's state, the scaler's state, the batch generator's state, PyTorch's random
-    state (dropout draws from it; on a GPU, save torch.cuda.get_rng_state_all() too), the step,
-    the best validation loss so far, and the config as a dict.
+    state (dropout draws from it; with a GPU, also torch.cuda.get_rng_state_all() or
+    torch.mps.get_rng_state()), the step, the best validation loss so far, and the config
+    as a dict.
 
     Write to a temporary file next to path first, then os.replace it onto path: if the run
     is cut off while saving, the old checkpoint is still whole.
@@ -104,6 +105,7 @@ def save_checkpoint(path, model, optimizer, scaler, generator, step, best_val, c
         "generator": generator.get_state(),
         "rng": torch.get_rng_state(),
         "cuda_rng": torch.cuda.get_rng_state_all() if torch.cuda.is_available() else None,
+        "mps_rng": torch.mps.get_rng_state() if torch.backends.mps.is_available() else None,
         "step": step,
         "best_val": best_val,
         "config": dataclasses.asdict(cfg),
@@ -125,6 +127,8 @@ def load_checkpoint(path, model, optimizer, scaler, generator):
     torch.set_rng_state(state["rng"])
     if state["cuda_rng"] is not None and torch.cuda.is_available():
         torch.cuda.set_rng_state_all(state["cuda_rng"])
+    if state.get("mps_rng") is not None and torch.backends.mps.is_available():
+        torch.mps.set_rng_state(state["mps_rng"])
     return state["step"], state["best_val"]
     # END SOLUTION
 

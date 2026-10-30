@@ -1,0 +1,16 @@
+# A smoke test: the whole pipeline in about a minute, even on a CPU. Its loss means little.
+context: 64
+n_layer: 2
+n_head: 2
+d_model: 64
+dropout: 0.0
+batch_size: 8
+grad_accum: 1
+max_steps: 200
+lr: 0.003
+min_lr: 0.0003
+warmup_steps: 20
+eval_interval: 50
+eval_steps: 5
+checkpoint_interval: 50
+out_dir: runs/tiny

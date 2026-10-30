@@ -1,0 +1,17 @@
+# For experiments (projects 4 to 6): 5.3M parameters, 3,000 steps of 8,192 tokens, about
+# one pass over the IMDB training text. Minutes on a GPU.
+context: 256
+n_layer: 4
+n_head: 4
+d_model: 256
+dropout: 0.0
+batch_size: 32
+grad_accum: 1
+max_steps: 3000
+lr: 0.001
+min_lr: 0.0001
+warmup_steps: 100
+eval_interval: 250
+eval_steps: 20
+checkpoint_interval: 250
+out_dir: runs/small

@@ -1,0 +1,18 @@
+# A full IMDB model: 29.9M parameters, 5,000 steps of 32,768 tokens (164M tokens, several
+# passes over the training text). Keeps the checkpoint with the best validation loss.
+context: 512
+n_layer: 8
+n_head: 8
+d_model: 512
+dropout: 0.1
+batch_size: 16
+grad_accum: 4
+max_steps: 5000
+lr: 0.0006
+min_lr: 0.00006
+warmup_steps: 200
+weight_decay: 0.1
+eval_interval: 250
+eval_steps: 20
+checkpoint_interval: 250
+out_dir: runs/base
