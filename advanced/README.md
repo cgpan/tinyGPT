@@ -89,7 +89,7 @@ session, and has one cell per command. You edit the `.py` files in Colab's file 
 
 The compute is exact (project 5 shows how it's counted). The times are **rough estimates**,
 assuming the GPU sustains about 20 TFLOPS for a fast gaming card and about 10 for Colab's
-T4; `python scripts/benchmark.py` measures yours in a minute.
+T4. Once you have done project 5, `python scripts/benchmark.py` measures yours in a minute.
 
 | config | parameters | tokens | compute | RTX 4070-class | Colab T4 |
 |---|---|---|---|---|---|
@@ -101,8 +101,8 @@ T4; `python scripts/benchmark.py` measures yours in a minute.
 Measured so far, on a 4-core CPU only: `small` runs at 3,800 tokens per second, which
 would take 107 minutes. A GPU should be tens of times faster.
 
-`base` needs about 4.6 GB of GPU memory with a batch of 16 (project 5's estimate), so it
-fits in 12 GB.
+`base` needs about 4.6 GB of GPU memory with a batch of 16 by project 5's rough estimate,
+well under 12 GB; the real number is part of project 5.
 
 ## The data
 

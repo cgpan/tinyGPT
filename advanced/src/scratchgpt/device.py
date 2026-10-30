@@ -29,7 +29,10 @@ def amp_dtype(device, setting="auto"):
     if setting != "auto":
         raise ValueError(f"dtype must be auto, float32, bfloat16 or float16, not {setting!r}")
     if device.type == "cuda":
-        return torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16
+        # bfloat16 runs natively from compute capability 8 (RTX 30 series, A100, L4). Older
+        # GPUs such as the T4 only emulate it, slowly, though is_bf16_supported() says yes.
+        native = torch.cuda.get_device_capability(device)[0] >= 8
+        return torch.bfloat16 if native else torch.float16
     return None
 
 

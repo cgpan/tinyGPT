@@ -54,8 +54,10 @@ After the stretch goal below, run it on everything: `python scripts/train_tokeni
 
 1. Print the first 20 merges as text (`tok.decode([256 + i])`). Were your predictions
    right? Why do so many tokens start with a space?
-2. Train with 1,024, 4,096, 8,192 and 16,384 tokens (`--vocab-size`, on a 10 MB sample)
-   and fill in a table of bytes per token. What do you gain from each doubling, and what
+2. Train with 1,024, 4,096, 8,192 and 16,384 tokens on a 10 MB sample, each into its own
+   folder so your real tokenizer in `data/imdb` stays as it is:
+   `python scripts/train_tokenizer.py --vocab-size 1024 --sample-mb 10 --out data/vocab-1024`.
+   Fill in a table of bytes per token. What do you gain from each doubling, and what
    does it cost? (Look ahead: the embedding table has vocab_size × d_model parameters.)
 3. Encode ` movie`, `Movie`, `MOVIE` and `moive`. What does that mean for how much the
    model must learn?

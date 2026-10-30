@@ -52,13 +52,17 @@ def test_fused_attention_means_the_same_as_yours(t_q):
     assert torch.allclose(perf.fused_causal_attention(q, k, v), layers.causal_attention(q, k, v), atol=1e-5)
 
 
-def test_the_model_can_use_fused_attention():
+def test_the_model_can_use_fused_attention(monkeypatch):
     torch.manual_seed(0)
     model = GPT(tiny_config()).eval()
     fused = GPT(tiny_config(fused_attention=True)).eval()
     fused.load_state_dict(model.state_dict())
+    calls = []
+    original = perf.fused_causal_attention
+    monkeypatch.setattr(perf, "fused_causal_attention", lambda *a: calls.append(1) or original(*a))
     ids = torch.randint(64, (2, 16))
     assert torch.allclose(model(ids)[0], fused(ids)[0], atol=1e-5)
+    assert len(calls) == 2, "with fused_attention, each block must call perf.fused_causal_attention"
 
 
 # --- the KV cache ----------------------------------------------------------------------

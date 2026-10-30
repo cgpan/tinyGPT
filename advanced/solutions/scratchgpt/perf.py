@@ -10,7 +10,7 @@ PEAK_TFLOPS = {
     "NVIDIA L4": 121,
     "NVIDIA A100": 312,
     "NVIDIA H100": 989,
-    "NVIDIA GeForce RTX 3060": 51,
+    "NVIDIA GeForce RTX 3060": 25.6,
     "NVIDIA GeForce RTX 4070": 58,
     "NVIDIA GeForce RTX 4070 SUPER": 71,
     "NVIDIA GeForce RTX 4080": 97,

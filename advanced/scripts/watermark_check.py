@@ -23,7 +23,7 @@ from scratchgpt.watermark import detect
 
 
 def main():
-    sys.stdout.reconfigure(line_buffering=True)   # show progress as it happens, in Colab too
+    sys.stdout.reconfigure(line_buffering=True, errors="replace")   # print as it happens; never crash on a character
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument("run")
     parser.add_argument("--tokens", type=int, default=150)

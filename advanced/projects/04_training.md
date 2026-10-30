@@ -80,8 +80,9 @@ curve carry on as if nothing happened?
    warmup help?
 3. Read 10 samples from `small`. What has it learned? What hasn't it? Keep them: you'll
    compare them with your final model.
-4. Remove `torch.set_rng_state` from `load_checkpoint` and run the resume test. Which number
-   differs, and why only that one?
+4. Remove `torch.set_rng_state` from `load_checkpoint` and run the resume test. From which
+   step do the resumed run's losses differ from the uninterrupted run's? Why does a
+   missing random state change the training at all, when the batches are the same?
 
 ## Stretch
 

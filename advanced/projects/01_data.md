@@ -69,7 +69,7 @@ what it did. Compare the counts with your predictions.
 
 ## Your data card
 
-Write `DATA_CARD.md` in your run folder, in your own words, with your numbers:
+Write `DATA_CARD.md` in the `advanced` folder, in your own words, with your numbers:
 
 - **Source:** who collected the reviews, when, and under what terms (see the README's
   License and data section).

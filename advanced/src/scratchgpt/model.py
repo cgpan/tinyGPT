@@ -6,7 +6,8 @@ from scratchgpt.layers import Attention, Embedding, FeedForward, Linear, RMSNorm
 
 
 class Block(nn.Module):
-    """One transformer block, pre-norm: x + attention(norm(x)), then x + feed_forward(norm(x))."""
+    """One transformer block, pre-norm: x + attention(norm(x)), then x + feed_forward(norm(x)).
+    forward(x, cos, sin, cache) passes cos, sin and the cache (project 5) on to attention."""
 
     def __init__(self, cfg, layer):
         super().__init__()
@@ -35,7 +36,8 @@ class GPT(nn.Module):
         """ids: (B, T) token ids. Returns (logits, loss): logits (B, T, vocab_size), and the
         cross-entropy against targets (B, T), or None without targets. With hidden=True,
         return only the final normalised hidden states (B, T, d_model) (project 7).
-        Raises ValueError if the positions would go past cfg.context."""
+        cache (project 5): a KVCache passed to every block; the new positions then start at
+        cache.length(0). Raises ValueError if the positions would go past cfg.context."""
         raise NotImplementedError("write this in project 3: see projects/03_model.md")
 
 

@@ -58,8 +58,10 @@ prediction for width 256, then trains 256 to check. Results go to
 1. How far off was the sweep's prediction for width 256? Is your fit's c believable?
 2. Plot your final run's validation loss together with the sweep's points. Is it on the
    line? If not, why not? (How many epochs did it make? Look at when `best.pt` was saved.)
-3. **The data wall.** Train `base` for twice the steps. Does validation loss keep falling,
-   flatten, or rise? This is why labs pay so much for data.
+3. **The data wall.** Train `base` for twice the steps, as a new run:
+   `python scripts/train.py configs/base.yaml max_steps=10000 out_dir=runs/base-2x`. (With
+   the old `out_dir` it would resume at step 5,000 with the schedule of a longer run.) Does
+   validation loss keep falling, flatten, or rise? This is why labs pay so much for data.
 
 ## Stretch
 

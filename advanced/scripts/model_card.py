@@ -74,7 +74,7 @@ Tokenizer: byte-level BPE, {number(meta, 'vocab_size')} tokens, about
 {number(meta, 'bytes_per_token', '{:.2f}')} bytes of text per token.
 
 ## Training
-{best['step']:,} steps at {cfg.tokens_per_step:,} tokens each; best validation loss
+{log[-1]['step']:,} steps at {cfg.tokens_per_step:,} tokens each; best validation loss
 {best['val_loss']:.4f} (nats per token) at step {best['step']:,}; {log[-1]['seconds'] / 3600:.2f} hours
 for the last run.
 

@@ -6,7 +6,9 @@ also build the KV cache, the trick that makes writing text fast.
 
 **You write**, in `src/scratchgpt/perf.py`: `matmul_parameters`, `flops_per_token`,
 `mfu`, `training_memory`; in `sampling.py`: `KVCache`, and the `use_cache` path of
-`generate`; and the cache branch of `Attention.forward` in `layers.py`.
+`generate`; in `layers.py`, the cache branch of `Attention.forward` and the
+`fused_attention` switch; and, if you didn't in project 3, passing the cache through
+`Block.forward` and `GPT.forward`, whose positions start at `cache.length(0)`.
 **Given:** `fused_causal_attention`, PyTorch's FlashAttention-style kernel, the one place
 `torch.nn.functional` is allowed, so you can compare it with yours; `PEAK_TFLOPS`, a few
 GPUs' peak speeds.
@@ -48,7 +50,8 @@ python scripts/benchmark.py configs/base.yaml context=1024 batch_size=8
 ```
 
 `compile=true` needs PyTorch's compiler, which works on Linux and Colab; on Windows it may
-not. Fill in your table:
+not. On a Mac, the memory column is what the GPU holds after the steps rather than the
+peak, and MFU stays empty: Apple doesn't publish the peak it would need. Fill in your table:
 
 | config | tokens/s | MFU | memory (measured) | memory (your estimate) | full run |
 |---|---|---|---|---|---|

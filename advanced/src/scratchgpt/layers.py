@@ -95,10 +95,12 @@ def causal_attention(q, k, v):
 class Attention(nn.Module):
     """Multi-head causal self-attention with rotary positions.
 
-    One Linear makes queries, keys and values together (d_model -> 3 * d_model); they are
-    cut into n_head heads of head_dim each; queries and keys are rotated with apply_rope;
-    causal_attention mixes the values; the heads are joined back and an output Linear
-    (d_model -> d_model) follows, then dropout.
+    One Linear, self.qkv, makes queries, keys and values together (d_model -> 3 * d_model,
+    in that order); they are cut into n_head heads of head_dim each; queries and keys are
+    rotated with apply_rope; causal_attention mixes the values; the heads are joined back
+    and an output Linear, self.out (d_model -> d_model), follows, then dropout.
+    With cfg.fused_attention (project 5), call perf.fused_causal_attention instead of
+    causal_attention: same inputs, same meaning, PyTorch's fast kernel.
 
     The output Linear starts smaller, with std = init_std / sqrt(2 * n_layer): each block adds
     its output to the residual stream, and this keeps the sum from growing with depth.

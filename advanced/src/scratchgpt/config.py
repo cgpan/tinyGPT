@@ -67,14 +67,20 @@ class Config:
 
 
 def _coerce(name, value):
-    """Turn a command-line string into the field's type: 'lr=3e-4' gives 0.0003."""
-    if not isinstance(value, str):
-        return value
-    parsed = yaml.safe_load(value)
-    if name in ("lr", "min_lr", "dropout", "weight_decay", "max_hours", "rope_theta",
-                "init_std", "beta1", "beta2", "grad_clip") and isinstance(parsed, int):
-        parsed = float(parsed)
-    return parsed
+    """Give a setting its field's type. YAML reads 3e-4 (no decimal point) as text, and
+    the command line gives text, so 'lr=3e-4' and 'lr: 3e-4' both become 0.0003 here."""
+    kind = {f.name: f.type for f in dataclasses.fields(Config)}[name]
+    if isinstance(value, str):
+        value = yaml.safe_load(value) if kind is not str else value
+    if kind is float or kind == "float":
+        return float(value)
+    if (kind is int or kind == "int") and isinstance(value, (int, float, str)) and not isinstance(value, bool):
+        return int(float(value))
+    if (kind is bool or kind == "bool") and isinstance(value, str):
+        raise ValueError(f"{name} must be true or false, not {value!r}")
+    if name == "d_ff" and value is not None:
+        return int(float(value))
+    return value
 
 
 def load_config(path=None, **overrides):

@@ -50,8 +50,9 @@ PYTHONPATH=solutions python -m pytest      # PowerShell: $env:PYTHONPATH="soluti
 python -m pytest                           # with the stubs: most tests fail, by design
 ```
 
-With the solution, all 159 tests pass. With the stubs, 26 pass (the rules, the layout, and
-tests of the given code) and the rest fail or error with "write this in project n".
+With the solution, all 165 tests pass. With the stubs, 32 pass (the rules, the layout, and
+tests of the given code), 2 are skipped (the maintainers' stub check) and the rest fail or
+error with "write this in project n".
 
 ## Is IMDB enough?
 
@@ -77,16 +78,23 @@ matters for students who take project 6's stretch and bring more data.
 
 Run, on a 4-core Linux CPU with PyTorch 2.15:
 
-- the whole test suite against the reference (159 passed), and against the stubs;
+- the whole test suite against the reference (165 passed), and against the stubs;
 - every script, end to end (`verify.py --quick`), on a fake IMDB folder made from
   Shakespeare's speeches, with the real folder layout;
+- `small` for 300 steps on that Shakespeare text (a 2,048-token tokenizer): validation
+  loss from 7.6 (ln 2,048) to 3.94, with a smooth curve, and text that looks like a play.
+  It says the settings are sane; it says nothing about IMDB;
+- training in float16 with the gradient scaler, on the CPU: the path a T4 takes;
 - planted bugs: removing either random-state restore, the gradient-accumulation division,
-  or AdamW's weight decay each fails exactly the test meant to catch it.
+  or AdamW's weight decay, or clipping before unscaling, each fails exactly the test meant
+  to catch it;
+- an independent review of the briefs against the code, whose findings are fixed (among
+  them: `lr=3e-4` was read as text, and a T4 would have chosen emulated bfloat16).
 
 Not run yet, and worth watching in the first reports:
 
 - the real IMDB download and its sizes, duplicate counts and timings;
-- CUDA: bfloat16 on RTX 30/40 series, float16 with the gradient scaler on a T4;
+- CUDA: bfloat16 on RTX 30/40 series, float16 with the gradient scaler on a real T4;
 - Apple's MPS backend (float32 by default), and Windows;
 - `torch.compile` (`compile=true`), which may not work on Windows;
 - `base` and the sweep at full size, and every quality number: bits per byte, sentiment

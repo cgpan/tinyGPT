@@ -18,7 +18,7 @@ from scratchgpt import data, imdb
 
 
 def main():
-    sys.stdout.reconfigure(line_buffering=True)   # show progress as it happens, in Colab too
+    sys.stdout.reconfigure(line_buffering=True, errors="replace")   # print as it happens; never crash on a character
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument("--data", default="data", help="where to download and write (default: data)")
     parser.add_argument("--val-fraction", type=float, default=0.1)

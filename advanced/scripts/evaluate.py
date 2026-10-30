@@ -40,7 +40,7 @@ def labelled(docs, n, seed):
 
 
 def main():
-    sys.stdout.reconfigure(line_buffering=True)   # show progress as it happens, in Colab too
+    sys.stdout.reconfigure(line_buffering=True, errors="replace")   # print as it happens; never crash on a character
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument("run")
     parser.add_argument("--max-tokens", type=int, default=2_000_000, help="test tokens for bits per byte (0: all)")

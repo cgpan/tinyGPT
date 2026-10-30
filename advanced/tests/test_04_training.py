@@ -193,7 +193,7 @@ def test_train_step_unscales_float16_gradients_before_clipping():
 
 
 def test_estimate_loss_is_repeatable_and_leaves_the_mode(token_dir):
-    model = GPT(tiny_config()).train()
+    model = GPT(tiny_config(dropout=0.5)).train()             # dropout would make every call differ
     tokens = training.load_tokens(token_dir / "val.bin")
     a = training.estimate_loss(model, tokens, tiny_config(), 3, torch.device("cpu"))
     b = training.estimate_loss(model, tokens, tiny_config(), 3, torch.device("cpu"))

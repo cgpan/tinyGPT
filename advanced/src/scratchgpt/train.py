@@ -53,11 +53,16 @@ def train_step(model, optimizer, batches, scaler, device, dtype=None, grad_clip=
 
 
 def save_checkpoint(path, model, optimizer, scaler, generator, step, best_val, cfg):
-    """Save everything needed to carry on exactly where training stopped: the model's and the
-    optimizer's state, the scaler's state, the batch generator's state, PyTorch's random
-    state (dropout draws from it; with a GPU, also torch.cuda.get_rng_state_all() or
-    torch.mps.get_rng_state()), the step, the best validation loss so far, and the config
-    as a dict.
+    """Save everything needed to carry on exactly where training stopped, as one dict:
+
+        "model", "optimizer", "scaler"   their state_dict()s
+        "generator"                      the batch generator's get_state()
+        "rng"                            torch.get_rng_state(): dropout draws from it
+        "cuda_rng", "mps_rng"            the GPU's random state, or None without that GPU
+                                         (torch.cuda.get_rng_state_all(), torch.mps.get_rng_state())
+        "step", "best_val"               the step reached, the best validation loss so far
+        "config"                         dataclasses.asdict(cfg)
+
 
     Write to a temporary file next to path first, then os.replace it onto path: if the run
     is cut off while saving, the old checkpoint is still whole.
@@ -66,7 +71,9 @@ def save_checkpoint(path, model, optimizer, scaler, generator, step, best_val, c
 
 
 def load_checkpoint(path, model, optimizer, scaler, generator):
-    """Restore what save_checkpoint saved into the given objects. Returns (step, best_val)."""
+    """Restore what save_checkpoint saved into the given objects. Returns (step, best_val).
+    Skip the scaler's state when it is empty: a run saved in bfloat16 can resume on a GPU
+    that needs float16."""
     raise NotImplementedError("write this in project 4: see projects/04_training.md")
 
 

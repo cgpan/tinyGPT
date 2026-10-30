@@ -18,7 +18,7 @@ from scratchgpt.train import load_model
 
 
 def main():
-    sys.stdout.reconfigure(line_buffering=True)   # show progress as it happens, in Colab too
+    sys.stdout.reconfigure(line_buffering=True, errors="replace")   # print as it happens; never crash on a character
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument("run", help="a run folder, such as runs/base")
     parser.add_argument("--prompt", default="")
