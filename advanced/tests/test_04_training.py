@@ -176,6 +176,22 @@ def test_train_step_clips_before_stepping():
     assert torch.sqrt(sum((g**2).sum() for g in rec.grads)).item() == pytest.approx(1e-3, rel=1e-3)
 
 
+def test_train_step_unscales_float16_gradients_before_clipping():
+    torch.manual_seed(0)
+    model = GPT(tiny_config())
+    opt = optim.AdamW(optim.parameter_groups(model, 0.1), lr=1e-2)
+    scaler = torch.amp.GradScaler("cpu", enabled=True)          # what a T4 uses, here on the CPU
+    ids = torch.randint(64, (4, 17))
+    try:
+        losses = [training.train_step(model, opt, [(ids[:, :-1], ids[:, 1:])], scaler, torch.device("cpu"),
+                                      torch.float16, grad_clip=1.0) for _ in range(20)]
+    except RuntimeError as error:                               # an older PyTorch without float16 on CPUs
+        pytest.skip(f"float16 autocast not available on this CPU: {error}")
+    assert losses[0][1] < 100, "the norm is 65,536 times too big: unscale before clipping"
+    assert losses[-1][0] < losses[0][0]
+    assert next(model.parameters()).dtype == torch.float32
+
+
 def test_estimate_loss_is_repeatable_and_leaves_the_mode(token_dir):
     model = GPT(tiny_config()).train()
     tokens = training.load_tokens(token_dir / "val.bin")

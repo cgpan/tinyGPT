@@ -11,6 +11,7 @@ import argparse
 import dataclasses
 import json
 import math
+import sys
 from pathlib import Path
 
 from scratchgpt.config import load_config, parse_overrides
@@ -21,6 +22,7 @@ from scratchgpt.train import train
 
 
 def main():
+    sys.stdout.reconfigure(line_buffering=True)   # show progress as it happens, in Colab too
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument("config")
     parser.add_argument("overrides", nargs="*", help="key=value settings, as for train.py")

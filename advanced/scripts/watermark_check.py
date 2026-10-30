@@ -10,6 +10,7 @@ the tokens at random. Nothing is saved but the scores (watermark.json in the run
 import argparse
 import json
 import random
+import sys
 from pathlib import Path
 
 import torch
@@ -22,6 +23,7 @@ from scratchgpt.watermark import detect
 
 
 def main():
+    sys.stdout.reconfigure(line_buffering=True)   # show progress as it happens, in Colab too
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument("run")
     parser.add_argument("--tokens", type=int, default=150)

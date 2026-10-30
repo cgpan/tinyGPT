@@ -14,6 +14,7 @@ from scratchgpt.train import train
 
 
 def main():
+    sys.stdout.reconfigure(line_buffering=True)   # show progress as it happens, in Colab too
     if len(sys.argv) < 2 or sys.argv[1] in ("-h", "--help"):
         print(__doc__)
         sys.exit(0)

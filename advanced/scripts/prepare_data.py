@@ -10,6 +10,7 @@ stats.json (what the pipeline did), then prints the numbers for your data card.
 
 import argparse
 import json
+import sys
 import time
 from pathlib import Path
 
@@ -17,6 +18,7 @@ from scratchgpt import data, imdb
 
 
 def main():
+    sys.stdout.reconfigure(line_buffering=True)   # show progress as it happens, in Colab too
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument("--data", default="data", help="where to download and write (default: data)")
     parser.add_argument("--val-fraction", type=float, default=0.1)

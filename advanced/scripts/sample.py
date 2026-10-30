@@ -8,6 +8,7 @@ see Responsible use in the README. It writes at most 5 texts at a time, on purpo
 """
 
 import argparse
+import sys
 from pathlib import Path
 
 from scratchgpt.device import get_device
@@ -17,6 +18,7 @@ from scratchgpt.train import load_model
 
 
 def main():
+    sys.stdout.reconfigure(line_buffering=True)   # show progress as it happens, in Colab too
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument("run", help="a run folder, such as runs/base")
     parser.add_argument("--prompt", default="")

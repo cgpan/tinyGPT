@@ -9,6 +9,7 @@ Writes tokenizer.json, train.bin, val.bin, test.bin and meta.json next to the da
 
 import argparse
 import json
+import sys
 import time
 from pathlib import Path
 
@@ -21,6 +22,7 @@ def read_texts(path):
 
 
 def main():
+    sys.stdout.reconfigure(line_buffering=True)   # show progress as it happens, in Colab too
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument("--data", default="data/imdb")
     parser.add_argument("--vocab-size", type=int, default=8192)

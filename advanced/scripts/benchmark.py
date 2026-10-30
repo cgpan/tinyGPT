@@ -63,6 +63,7 @@ def benchmark(cfg, steps=10, warmup=3):
 
 
 def main():
+    sys.stdout.reconfigure(line_buffering=True)   # show progress as it happens, in Colab too
     paths = [a for a in sys.argv[1:] if "=" not in a] or sorted(str(p) for p in Path("configs").glob("*.yaml"))
     overrides = parse_overrides([a for a in sys.argv[1:] if "=" in a])
     rows = []
