@@ -3,7 +3,7 @@ solution, and write a report.
 
     python scripts/verify.py              # everything: about 1 to 2 hours with a GPU
     python scripts/verify.py --quick      # the pipeline on a 2 MB slice, tiny model: minutes
-    python scripts/verify.py --sweep      # also the scaling sweep (adds 20 to 40 minutes)
+    python scripts/verify.py --sweep      # also the scaling sweep (adds roughly 10 to 30 minutes)
 
 Downloads IMDB (84 MB) into data/, trains into runs/verify-*, and writes
 runs/report-advanced-<computer name>.md. Nothing in the repository is changed.

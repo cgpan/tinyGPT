@@ -1,0 +1,36 @@
+# Project 8 · Notes on the solution
+
+Try the project yourself first. A solution you have read teaches much less than one you
+fought with, even if you didn't finish.
+
+The code is in [`scratchgpt/watermark.py`](scratchgpt/watermark.py).
+
+## `detect`
+
+For each token after the first, check whether it is in the green list that its previous
+token picks. With T tokens checked and G green, unmarked text has G ≈ γT with variance
+Tγ(1 − γ), so z = (G − γT) / √(Tγ(1 − γ)). With γ = 0.25 and 150 tokens, chance gives
+about 37 green tokens with a standard deviation of 5.3; z = 4 means about 59.
+
+## Predict 2 and 4
+
+- **Random replacement.** Each replaced token is green by chance, and it also changes the
+  green list of the token after it. A check survives only if both its tokens do
+  (0.75 × 0.75 when a quarter are replaced), so a quarter spoils nearly half the checks.
+  On a tiny test model trained while writing this project, 20 of 20 texts were still
+  flagged after a quarter of their tokens were replaced, and 9 of 20 after half.
+- **False alarms.** A real review is green at the chance rate, so z > 4 happens about 3 times
+  in 100,000. In 20 real reviews, expect none.
+
+## Predict 3: low-entropy text
+
+When the model is nearly sure of the next token, adding 2 to the green scores rarely
+changes the choice, so that token carries almost no watermark. Text that is predictable
+(repeated phrases, a stock opening) is weakly marked; the watermark lives in the tokens
+where the model had real choice.
+
+## Investigate 3: the key
+
+Anyone with the key can detect the watermark, and also forge it: write text that is all
+green, so a person's text is "detected" as generated, or remove it carefully. That's why
+the key is kept private, and why a public detection service is safer than a public key.
