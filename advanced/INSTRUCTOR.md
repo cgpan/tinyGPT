@@ -14,8 +14,7 @@ you.
       (`colab.ipynb`) on a T4 up to project 4, or `python scripts/verify.py --quick` in a
       Colab cell. Its T4 trains in float16 with the gradient scaler: tested on a CPU, but
       not yet on a real GPU. The README's T4 times are estimates.
-- [ ] **Make the repository public** (or give students access): the Colab workspace clones
-      it. Until then, test in Colab with a token, as in the entry track's instructor note.
+- [x] **Make the repository public**: the Colab workspace clones it.
 
 ```bash
 cd advanced
@@ -49,7 +48,7 @@ PYTHONPATH=solutions python -m pytest      # PowerShell: $env:PYTHONPATH="soluti
 python -m pytest                           # with the stubs: most tests fail, by design
 ```
 
-With the solution, all 165 tests pass. With the stubs, 32 pass (the rules, the layout, and
+With the solution, all 166 tests pass. With the stubs, 33 pass (the rules, the layout, and
 tests of the given code), 2 are skipped (the maintainers' stub check) and the rest fail or
 error with "write this in project n".
 
@@ -79,7 +78,7 @@ and, once, an ableist slur. Project 8's model card asks students to look for thi
 
 Run, with the reference solution:
 
-- the whole test suite, 165 passed, on Linux, Windows and macOS;
+- the whole test suite on Linux, Windows and macOS (165 tests then; 166 now);
 - `verify.py` in full on the RTX 4070 SUPER (bfloat16, with the scaling sweep) and the
   M5 Max (float32): the IMDB download, data preparation, the tokenizer, `small`, `base`,
   samples, evaluation, the watermark check and the model card. The two machines give the

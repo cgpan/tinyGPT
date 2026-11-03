@@ -39,3 +39,14 @@ def test_colab_workspace_runs_only_scripts_that_exist():
             if word.startswith("scripts/") or word.startswith("tests/") or word.startswith("configs/"):
                 if word != "configs/final.yaml":                # the student writes this one
                     assert (ROOT / word).exists(), word
+
+
+def test_colab_workspace_keeps_clear_of_the_entry_tracks_drive_folder():
+    # The entry track keeps its trained model in MyDrive/tinyGPT (entry/src/tinygpt/notebook.py).
+    # If the workspace cloned into that folder too, it would find it, skip the clone, and fail.
+    notebook = json.loads((ROOT / "colab.ipynb").read_text(encoding="utf-8"))
+    setup = "".join(notebook["cells"][1]["source"])
+    folders = [line.split('Path("')[1].split('")')[0] for line in setup.splitlines() if line.startswith("REPO = ")]
+    assert folders and folders[0] != "/content/drive/MyDrive/tinyGPT"
+    entry_helper = (ROOT.parent / "entry" / "src" / "tinygpt" / "notebook.py").read_text(encoding="utf-8")
+    assert '"MyDrive" / "tinyGPT" / "model.pt"' in entry_helper, "the entry track's Drive folder moved: update this test"

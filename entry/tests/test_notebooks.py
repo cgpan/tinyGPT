@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 NOTEBOOKS = sorted((Path(__file__).parents[1] / "notebooks").glob("*.ipynb"))
+REPO = Path(__file__).resolve().parents[2]          # the repository: entry/ sits inside it
 STEPS = ["## 1 · Predict", "## 2 · Run", "## 3 · Investigate", "## 4 · Modify", "## 5 · Make"]
 
 
@@ -46,9 +47,11 @@ def test_exactly_one_open_box(path):
 
 @pytest.mark.parametrize("path", NOTEBOOKS, ids=lambda p: p.stem)
 def test_solutions_live_in_their_own_file(path):
-    text = "\n".join(cells(path, "markdown"))
-    assert f"solutions/{path.stem}.md" in text
-    assert (path.parents[1] / "solutions" / f"{path.stem}.md").exists()
+    solution = path.resolve().parents[1] / "solutions" / f"{path.stem}.md"
+    assert solution.exists()
+    # Colab can't follow relative links, so the notebook links to the file on GitHub
+    url = f"https://github.com/cgpan/tinyGPT/blob/main/{solution.relative_to(REPO).as_posix()}"
+    assert url in "\n".join(cells(path, "markdown")), f"the link to the solution should be {url}"
     assert not any("Solution" in source for source in cells(path, "code"))
 
 
