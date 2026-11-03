@@ -8,6 +8,9 @@ build/
 runs/
 *.pt
 
+# downloaded and prepared data (the advanced track)
+advanced/data/
+
 # notebooks
 .ipynb_checkpoints/
 
