@@ -48,9 +48,21 @@ from them, cite Maas et al. (2011), *Learning Word Vectors for Sentiment Analysi
 
 ## Credits
 
-The entry track's model follows Andrej Karpathy's
-[nanoGPT](https://github.com/karpathy/nanoGPT) and
-[ng-video-lecture](https://github.com/karpathy/ng-video-lecture). The advanced track's
-format, a test suite that specifies every piece students write, follows Stanford's
-[CS336, Language Modeling from Scratch](https://stanford-cs336.github.io/); its projects
-and code are our own.
+tinyGPT builds on other people's work; [CREDITS.md](CREDITS.md) lists all of it, with its
+terms. In short:
+
+- The entry track's corpus, `tinyshakespeare`, comes from Andrej Karpathy's
+  [char-rnn](https://github.com/karpathy/char-rnn) (MIT); Shakespeare's plays are in the
+  public domain.
+- The entry track's model follows Karpathy's [nanoGPT](https://github.com/karpathy/nanoGPT)
+  and his lecture code, [ng-video-lecture](https://github.com/karpathy/ng-video-lecture).
+- Entry chapter 8 downloads OpenAI's GPT-2 small from Hugging Face
+  ([`openai-community/gpt2`](https://huggingface.co/openai-community/gpt2)).
+- The advanced track's tokenizer splits text with GPT-2's pattern, from OpenAI's
+  [gpt-2](https://github.com/openai/gpt-2), rewritten for Python's `re` module.
+- The advanced track downloads the IMDB reviews of Maas et al. (2011) from Stanford.
+- The advanced track's format, a test suite that specifies every piece students write,
+  follows Stanford's [CS336, Language Modeling from Scratch](https://stanford-cs336.github.io/);
+  its projects, tests and code are our own.
+- The entry track's chapters follow PRIMM (Sentance, Waite and Kallia, 2019): Predict, Run,
+  Investigate, Modify, Make. The advanced projects keep its Predict step.

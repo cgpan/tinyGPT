@@ -4,9 +4,9 @@ Build and train a small GPT yourself: a character-level transformer that learns 
 write Shakespeare-like text from one 1 MB file. No `transformers` library. Every line
 of the model, including the attention code, is in this repository and meant to be read.
 
-> **Status:** in progress. The package, its tests, the measured numbers below, and
-> all eight chapters are written, and everything has been run on Windows (NVIDIA GPU),
-> macOS (Apple Silicon) and Linux. Still to do: a check on Colab's T4 GPU.
+> **Tested** on Windows (NVIDIA RTX 4070 SUPER), macOS (Apple M5 Max) and Linux. Colab
+> hasn't been tested yet, and its training times below are estimates. If a chapter doesn't
+> work for you there, or anywhere, please [open an issue](https://github.com/cgpan/tinyGPT/issues).
 >
 > This is the entry track. When you finish it, the [advanced track](../advanced/README.md)
 > has you write every piece of a language model yourself. Please read
@@ -193,4 +193,7 @@ differences aside). Training times do not.
 The model follows the decoder-only transformer as taught in Andrej Karpathy's
 [nanoGPT](https://github.com/karpathy/nanoGPT) and
 [ng-video-lecture](https://github.com/karpathy/ng-video-lecture). The corpus is
-`tinyshakespeare` from his [char-rnn](https://github.com/karpathy/char-rnn) repository.
+`tinyshakespeare` from his [char-rnn](https://github.com/karpathy/char-rnn) repository (MIT);
+Shakespeare's plays are in the public domain. Chapter 8 downloads OpenAI's GPT-2 small from
+Hugging Face. The five steps of every chapter are PRIMM (Sentance, Waite and Kallia, 2019).
+[CREDITS.md](../CREDITS.md) lists everything this project uses, with its terms.

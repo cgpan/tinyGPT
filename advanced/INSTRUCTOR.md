@@ -10,9 +10,10 @@ you.
       (Windows 11, PyTorch 2.11, bfloat16) and an Apple M5 Max (macOS, PyTorch 2.15, float32):
       every step OK. The numbers are at the end of this page.
 - [x] **Is IMDB enough?** Yes; see below.
-- [ ] **Colab.** Run the workspace notebook (`colab.ipynb`) on a T4 up to project 4, or
-      `python scripts/verify.py --quick` in a Colab cell. Its T4 trains in float16 with the
-      gradient scaler: tested on a CPU, but not yet on a real GPU.
+- [ ] **Colab** (not done for the first release). Run the workspace notebook
+      (`colab.ipynb`) on a T4 up to project 4, or `python scripts/verify.py --quick` in a
+      Colab cell. Its T4 trains in float16 with the gradient scaler: tested on a CPU, but
+      not yet on a real GPU. The README's T4 times are estimates.
 - [ ] **Make the repository public** (or give students access): the Colab workspace clones
       it. Until then, test in Colab with a token, as in the entry track's instructor note.
 

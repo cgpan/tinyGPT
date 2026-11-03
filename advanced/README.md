@@ -6,10 +6,11 @@ with a release. Then train it on 100,000 IMDB movie reviews and find out what it
 This is the work of the people who build language models at AI companies, at a scale that
 fits one GPU.
 
-> **Status:** run end to end, on all of IMDB with the reference solution, on an NVIDIA
+> **Tested** end to end, on all of IMDB with the reference solution, on an NVIDIA
 > RTX 4070 SUPER (Windows, bfloat16) and an Apple M5 Max (float32). The numbers below come
-> from those runs unless they are marked as estimates. Still to do: Colab, whose T4 trains
-> in float16, the one path not yet run on a real GPU.
+> from those runs unless they are marked as estimates. Colab hasn't been tested yet: its
+> T4 trains in float16, which has only been checked on a CPU. If something doesn't work
+> for you, please [open an issue](https://github.com/cgpan/tinyGPT/issues).
 
 Please read [Responsible use](../README.md#responsible-use) first. In short: this is for
 learning. Never use it to write fake reviews or comments, to pose as real people, or to
@@ -156,4 +157,5 @@ solutions/            the reference package, and notes per project
 colab.ipynb           the Colab workspace
 ```
 
-Teaching with it? See [INSTRUCTOR.md](INSTRUCTOR.md).
+Teaching with it? See [INSTRUCTOR.md](INSTRUCTOR.md). The papers behind each project, and
+everything else this track builds on, are listed in [CREDITS.md](../CREDITS.md).

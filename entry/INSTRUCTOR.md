@@ -7,11 +7,12 @@ in Colab or on their own GPU machine. This page is for you.
 
 - [ ] **Make the repository public.** Every notebook's setup cell clones it. While it is
       private, the setup cell fails in Colab for everyone except you (see below).
-- [ ] **Run each chapter in Colab.** Open it from the links in the README and choose
-      Runtime > Run all. It should finish without errors. Chapters 1 and 2 take under a
-      minute and need no GPU.
-- [ ] **From chapter 3 on, check the training times.** Run `python scripts/benchmark.py`
-      once on a Colab T4, and on a Mac if you have one.
+- [ ] **Run each chapter in Colab** (not done for the first release). Open it from the
+      links in the README and choose Runtime > Run all. It should finish without errors.
+      Chapters 1 and 2 take under a minute and need no GPU.
+- [x] **Check the training times.** Measured on an NVIDIA RTX 4070 SUPER and an Apple M5
+      Max. The Colab T4 times in the README are estimates until someone runs
+      `python scripts/benchmark.py` there.
 
 ### Checking it on your own machine
 
