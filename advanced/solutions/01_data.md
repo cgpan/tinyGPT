@@ -10,7 +10,21 @@ The code is in [`scratchgpt/data.py`](scratchgpt/data.py).
 100,000 reviews make 100,000 × 99,999 / 2 ≈ 5 billion pairs. At a million comparisons
 a second that is about 83 minutes, and comparing two real texts is far slower than a
 millionth of a second. With MinHash and banding, each review is hashed once and only pairs
-that share a band are compared: the whole pipeline takes minutes.
+that share a band are compared: on all of IMDB the whole pipeline took 40 to 57 seconds.
+
+## What the reference found in IMDB
+
+| | count |
+|---|---|
+| exact duplicates removed | 1,151: 949 among the 75,000 training reviews, 202 among the 25,000 test reviews |
+| near-duplicates removed from training | 43 |
+| training reviews removed because they repeated a test review | 389 |
+| email addresses, web addresses, phone numbers replaced | 95, 425, 6 |
+| documents left: training, validation, test | 73,619 (96.4 MB), 2,480 (3.2 MB), 22,318 (28.4 MB) |
+
+So the answer to Predict 2 is yes: 389 training reviews repeated, or nearly repeated, a
+test review. Print a few of them: where do they come from, given that IMDB's labelled
+training and test reviews are about different films?
 
 ## What's easy to get wrong
 

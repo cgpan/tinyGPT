@@ -59,7 +59,10 @@ python scripts/evaluate.py runs/final
 2. Print the surprise at each token of one test review. Which words surprise the model
    most? Names, plot details, the verdict?
 3. Which beats which in sentiment: your model's features or word counts? Did the bigger
-   model help? What does that say about what pretraining on reviews teaches?
+   model help? Before you conclude anything, ask whether the comparison is fair: both
+   probes get the same 4,000 reviews and the same light regularisation, but one has 512
+   features and the other 8,192. What does the result say about what pretraining on
+   reviews teaches, and what doesn't it say?
 4. Look at the reviews your model continued exactly, if any. What are they? Short? Did
    project 1's deduplication miss something?
 5. A higher temperature makes writing more varied. What does it do to bits per byte?
@@ -72,3 +75,7 @@ python scripts/evaluate.py runs/final
   How accurate is that?
 - **Calibration.** When your model gives a token 30%, is it right 30% of the time? Bin
   the predicted probabilities of the chosen tokens and compare.
+- **Give the baseline its best chance.** Tune the word-count probe: all 25,000 labelled
+  training reviews (`--probe-train 25000`), features that say only whether a token occurs,
+  stronger weight decay. How close does it come to your model's features? A baseline you
+  didn't tune proves little about the method you did.

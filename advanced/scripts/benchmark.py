@@ -55,7 +55,7 @@ def benchmark(cfg, steps=10, warmup=3):
               "parameters": count_parameters(model), "seconds_per_step": seconds,
               "tokens_per_second": cfg.tokens_per_step / seconds,
               "minutes_for_run": seconds * cfg.max_steps / 60,
-              "estimated_gb": training_memory(cfg, cfg.batch_size)["total"] / 1e9}
+              "estimated_gb": training_memory(cfg, cfg.batch_size, 2 if dtype else 4)["total"] / 1e9}
     peak = peak_tflops(result["device"])
     result["mfu"] = mfu(result["tokens_per_second"], cfg, peak) if peak else None
     result["peak_gb"] = None

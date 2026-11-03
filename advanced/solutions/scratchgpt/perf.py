@@ -75,18 +75,20 @@ def training_memory(cfg, batch_size, bytes_per_activation=2):
         activations  what the backward pass keeps, for one forward pass of batch_size
         total        the sum
 
-    Activations, per layer and per token: about 34 * d_model numbers (the inputs of each
-    Linear, the norms, SwiGLU's pieces) and n_head * context numbers for each of the
-    attention scores, the weights and the mask (our attention keeps all three), each
-    bytes_per_activation bytes; plus the logits, 4 * vocab_size bytes per token. Use
-    parameter_formula for the parameter count.
+    Activations, per token. In each layer: about 34 * d_model numbers of
+    bytes_per_activation bytes each (the inputs of each Linear, the norms, SwiGLU's pieces),
+    and, for each head, a row of context attention scores that our attention keeps three
+    times: the scores and their exponentials in float32 (4 bytes each), and the weights in
+    bytes_per_activation bytes. Then the loss keeps two float32 copies of the logits:
+    8 bytes per vocabulary entry. bytes_per_activation is 2 in 16-bit mixed precision and 4
+    in float32. Use parameter_formula for the parameter count.
     """
     # BEGIN SOLUTION 5
     from scratchgpt.model import parameter_formula
     n = parameter_formula(cfg)
     tokens = batch_size * cfg.context
-    per_layer = (34 * cfg.d_model + 3 * cfg.n_head * cfg.context) * bytes_per_activation
-    activations = tokens * (cfg.n_layer * per_layer + 4 * cfg.vocab_size)
+    per_layer = 34 * cfg.d_model * bytes_per_activation + cfg.n_head * cfg.context * (8 + bytes_per_activation)
+    activations = tokens * (cfg.n_layer * per_layer + 8 * cfg.vocab_size)
     out = {"params": 4 * n, "grads": 4 * n, "optimizer": 8 * n, "activations": activations}
     out["total"] = sum(out.values())
     return out

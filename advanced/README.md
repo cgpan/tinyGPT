@@ -6,11 +6,10 @@ with a release. Then train it on 100,000 IMDB movie reviews and find out what it
 This is the work of the people who build language models at AI companies, at a scale that
 fits one GPU.
 
-> **Status:** designed and tested; not yet run on a GPU. The reference solution passes the
-> whole test suite, and the pipeline has been run end to end on a CPU with stand-in data
-> (the real download was blocked where this was written). Still to do: a full run on
-> IMDB with `scripts/verify.py` on an NVIDIA GPU, a Mac and Colab, and the measured numbers
-> that come from it.
+> **Status:** run end to end, on all of IMDB with the reference solution, on an NVIDIA
+> RTX 4070 SUPER (Windows, bfloat16) and an Apple M5 Max (float32). The numbers below come
+> from those runs unless they are marked as estimates. Still to do: Colab, whose T4 trains
+> in float16, the one path not yet run on a real GPU.
 
 Please read [Responsible use](../README.md#responsible-use) first. In short: this is for
 learning. Never use it to write fake reviews or comments, to pose as real people, or to
@@ -85,24 +84,48 @@ Open the workspace notebook:
 It keeps your code and checkpoints in Google Drive, so your work survives the end of a
 session, and has one cell per command. You edit the `.py` files in Colab's file browser.
 
+## What your model will write
+
+The number, in bits per byte of held-out reviews (lower is better; project 7 explains it):
+
+| | bits per byte | |
+|---|---|---|
+| knowing nothing | 8 | every byte value equally likely |
+| gzip | 3.25 | the compression program, as a baseline |
+| token frequencies | 2.52 | each token's share of the training text, ignoring context |
+| `small` (5.3M parameters) | 1.53 | after 3,000 steps (validation reviews) |
+| `base` (29.9M parameters) | 1.34 | after 5,000 steps (test reviews: 1.335 and 1.341 on the two machines) |
+
+`base` writes reviews like this one (its first sample on the Mac, watermarked, not a real review):
+
+> This movie has many of the most impressive effects ever to come across on film. The acting
+> is superb, the special effects are great, and there is a lot of atmosphere in it. The
+> movie's plot has been told many times and too often is given a very strong central idea.
+
+Its sentences are grammatical and about films, but a review drifts and contradicts itself
+("the acting was fantastic ... You will be disappointed by the acting"), repeats stock
+phrases, and invents names. It learned from unfiltered reviews: in our runs it wrote
+profanity and, once, an ableist slur. That belongs in your model card (project 8).
+
 ## How long training takes
 
-The compute is exact (project 5 shows how it's counted). The times are **rough estimates**,
-assuming the GPU sustains about 20 TFLOPS for a fast gaming card and about 10 for Colab's
-T4. Once you have done project 5, `python scripts/benchmark.py` measures yours in a minute.
+Measured with the reference solution. Your own code may be faster or slower; once you have
+done project 5, `python scripts/benchmark.py` measures it in a minute.
 
-| config | parameters | tokens | compute | RTX 4070-class | Colab T4 |
-|---|---|---|---|---|---|
-| `tiny` | 0.6M | 0.1M | a smoke test | seconds | seconds |
-| `small` | 5.3M | 24.6M | 8.6 × 10¹⁴ FLOPs | 1–2 min | 2–3 min |
-| `base` | 29.9M | 164M | 3.4 × 10¹⁶ FLOPs | about 30 min | about 1 hour |
-| your final model (project 6) | you decide | | | up to 24 hours | |
+| config | parameters | tokens | compute | RTX 4070 SUPER | Apple M5 Max | Colab T4 |
+|---|---|---|---|---|---|---|
+| `tiny` | 0.6M | 0.1M | a smoke test | seconds | seconds | seconds |
+| `small` | 5.3M | 24.6M | 8.6 × 10¹⁴ FLOPs | 2.5 min | 4 min | about 5 min |
+| `base` | 29.9M | 164M | 3.4 × 10¹⁶ FLOPs | 77 min | 115 min | about 2–3 hours |
+| your final model (project 6) | you decide | | | | | up to 24 hours |
+| | | | | measured | measured | estimate |
 
-Measured so far, on a 4-core CPU only: `small` runs at 3,800 tokens per second, which
-would take 107 minutes. A GPU should be tens of times faster.
+The 4070 SUPER trained in bfloat16 at 35,000 tokens per second for `base`, 10% of its
+peak; the M5 Max in float32 at 23,000. The T4 column is scaled from those by its memory
+speed and isn't measured. Paid Colab's L4 and A100 are faster GPUs; we haven't timed them either.
 
-`base` needs about 4.6 GB of GPU memory with a batch of 16 by project 5's rough estimate,
-well under 12 GB; the real number is part of project 5.
+`base` with a batch of 16 used 6.6 GB of GPU memory at its peak on the 4070 SUPER, and the
+Apple GPU held 9.8 GB in float32: it fits a 12 GB card and a 24 GB Mac.
 
 ## The data
 

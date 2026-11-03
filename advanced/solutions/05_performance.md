@@ -12,12 +12,25 @@ The code is in [`scratchgpt/perf.py`](scratchgpt/perf.py), and the cache in
 - **Compute for `base`.** 29,884,416 parameters in matrix multiplications, so 6 × that is
   179.3M FLOPs per token, plus 25.2M for attention's own products (12 × 8 layers × 512 ×
   512): 204.5M FLOPs per token. 5,000 steps of 32,768 tokens are 163.8M tokens, so
-  3.35 × 10¹⁶ FLOPs. At 20 TFLOPS that is 28 minutes.
-- **Memory for `base` with a batch of 16** (the project's estimate): weights 0.12 GB,
-  gradients 0.12 GB, AdamW's moments 0.24 GB, activations 4.16 GB. The activations win by
-  far, and they are what a bigger batch or a longer context costs.
+  3.35 × 10¹⁶ FLOPs. At 20 TFLOPS that is 28 minutes. The RTX 4070 SUPER sustained
+  7.2 TFLOPS (35,431 tokens per second, 10% of its 71 TFLOPS peak) and took 77 minutes; the
+  M5 Max, in float32, sustained 4.8 TFLOPS and took 115.
+- **Memory for `base` with a batch of 16** (the project's estimate, in bfloat16): weights
+  0.12 GB, gradients 0.12 GB, AdamW's moments 0.24 GB, activations 5.50 GB. The activations
+  win by far, and they are what a bigger batch or a longer context costs. Measured: a peak
+  of 6.6 GB on the RTX 4070 SUPER.
 - **Context 512 to 1,024.** Each sequence's score matrices grow 4 times (context²); per
-  token, twice. With half the batch (8), activations go from 4.16 to 5.77 GB in the estimate.
+  token, twice. With half the batch (8), activations go from 5.50 to 8.19 GB in the estimate.
+
+## Investigate 2: what the estimate leaves out
+
+The estimate says 6.0 GB for `base`; the 4070 SUPER's peak was 6.6 GB. The rest is the
+backward pass's own temporary tensors (the gradients of the activations, alive alongside
+the activations they replace), autocast's 16-bit copies of the weights, and the memory
+allocator's rounding. A first version of the estimate counted the attention scores at
+2 bytes each and the logits once, and said 4.6 GB. But our softmax keeps the scores and
+their exponentials in float32, and the loss keeps two float32 copies of the logits. Tracing
+what autograd saves, tensor by tensor, found that.
 
 ## Predict 4: the cache
 

@@ -66,6 +66,10 @@ python scripts/sample.py runs/small --prompt "I watched this movie last night an
 **On Colab:** your runs must live on Google Drive or they vanish with the session. Use
 `out_dir=/content/drive/MyDrive/tinyGPT-runs/small` (the Colab notebook sets this up).
 
+**What it writes.** Your model learned from unfiltered reviews, and can write profanity or
+slurs; the reference model did both in our test runs. Note what you see: it goes into
+your model card in project 8.
+
 **The drill.** Start `configs/base.yaml`, stop it with Ctrl+C (or *Runtime > Interrupt*)
 after the first checkpoint, and run the same command again. Check `log.jsonl`: does the
 curve carry on as if nothing happened?

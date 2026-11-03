@@ -17,17 +17,28 @@ about 37 green tokens with a standard deviation of 5.3; z = 4 means about 59.
 - **Random replacement.** Each replaced token is green by chance, and it also changes the
   green list of the token after it. A check survives only if both its tokens do
   (0.75 × 0.75 when a quarter are replaced), so a quarter spoils nearly half the checks.
-  On a tiny test model trained while writing this project, 20 of 20 texts were still
-  flagged after a quarter of their tokens were replaced, and 9 of 20 after half.
+  With `base`, 20 of 20 texts (19 of 20 on the Mac) were still flagged after a quarter of
+  their tokens were replaced, and 0 of 20 (1 of 20) after half.
 - **False alarms.** A real review is green at the chance rate, so z > 4 happens about 3 times
   in 100,000. In 20 real reviews, expect none.
+
+## What we measured with `base`
+
+| 20 texts each | mean z | flagged (z > 4) |
+|---|---|---|
+| watermarked | 11.3 (PC), 11.1 (Mac) | 100% |
+| not watermarked | 0.2, −0.3 | 0% |
+| real test reviews | −0.3 | 0% |
 
 ## Predict 3: low-entropy text
 
 When the model is nearly sure of the next token, adding 2 to the green scores rarely
 changes the choice, so that token carries almost no watermark. Text that is predictable
 (repeated phrases, a stock opening) is weakly marked; the watermark lives in the tokens
-where the model had real choice.
+where the model had real choice. It shows, roughly, in the numbers: per token checked,
+`base`'s watermark (z 11.1 to 11.3 over 149 tokens) is about three quarters as strong as
+that of a tiny, much less certain test model (z 12.6 over 99 tokens), though the two also
+differ in data and vocabulary.
 
 ## Investigate 3: the key
 

@@ -22,6 +22,21 @@ catches each of these, and removing either line from `load_checkpoint` makes it 
 That is how you know a resume is right: not that the loss looks reasonable, but that it is
 identical.
 
+## Predict 1 and 4, measured
+
+| | validation loss | bits per byte | time |
+|---|---|---|---|
+| untrained | about 9.1 | about 3.3 | |
+| `small`, 3,000 steps | 4.23 | 1.53 | 2.5 min (RTX 4070 SUPER), 4 min (M5 Max) |
+| `base`, 5,000 steps | 3.72 (PC), 3.74 (Mac) | 1.35 | 77 min (PC), 115 min (Mac) |
+
+(Bits per byte here is the validation loss divided by ln 2 × 3.98 bytes per token.)
+
+`small` already writes something that reads like a review: sentences about acting, plots and
+endings, with invented words ("Propretty Python") and sentences that go nowhere. `base`
+writes grammatical reviews whose sentences each make sense, but which drift and contradict
+each other. It doesn't continue training reviews word for word: project 7 measures that.
+
 ## Predict 3: gradient accumulation
 
 The same, up to rounding, when each batch's loss is divided by the number of batches: the

@@ -15,9 +15,32 @@ solution was being written: the probe scored 52% on separable data.) Writing max
 (z + |z|) / 2 gives the true gradient of 1/2 at zero. Starting from small random weights
 would also hide the problem, which is a reason to know it is there.
 
+## What we measured
+
+| | RTX 4070 SUPER | M5 Max |
+|---|---|---|
+| bits per byte, `base`, test reviews | 1.335 | 1.341 |
+| bits per byte, token frequencies | 2.524 | 2.524 |
+| bits per byte, gzip | 3.252 | 3.252 |
+| sentiment: probe on `base`'s features | 85.9% | 85.0% |
+| sentiment: probe on word counts | 71.2% | 71.2% |
+| training reviews continued exactly | 0.0% | 0.0% |
+
+## Investigate 3: which beats which
+
+`base`'s features beat word counts by about 14 points with this probe, but don't read too
+much into that. The word-count probe is weak: 8,192 features learned from 4,000 reviews, with the
+same light weight decay as the model's 512. A token that appears in a handful of training
+reviews becomes, after standardising, a huge feature that the probe can fit to those
+reviews alone; that is the likely reason. Word-count classifiers tuned on all 25,000
+labelled reviews reach the high 80s (Maas et al., 2011). What the comparison does show:
+with only 4,000 labelled reviews, the features of a model pretrained without labels support
+85% accuracy. Whether they beat a tuned word-count classifier is the stretch goal.
+
 ## Investigate 1: validation loss against bits per byte
 
-They should agree closely but not exactly. Training's validation loss is a mean over random
+They should agree closely but not exactly: `base`'s validation loss of 3.715 nats per
+token is 1.347 bits per byte, and `bits_per_byte` gave 1.335 on the test reviews. Training's validation loss is a mean over random
 windows, includes the end-of-text tokens, and is in nats per token; `bits_per_byte` reads
 the whole test text once, skips end-of-text tokens, and divides by bytes. Convert one into
 the other with bytes per token and ln 2, and the difference that remains is those details.
